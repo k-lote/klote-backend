@@ -91,3 +91,20 @@ def update():
 
     return "User updated", 200
 
+@auth.route("/reset_password", methods=["PUT"])
+def reset_password():
+    user_id = request.json.get("user_id")
+    password = request.json.get("password")
+
+    user = User_klote.query.filter_by(user_id=user_id).first()
+
+    if not user:
+        return "User not found", 400
+
+    if User_klote.validates_password(password)[0] is False:
+        return User_klote.validates_password(password)[1], 400
+    
+    user.password = generate_password_hash(password, method='sha256')
+    db.session.commit()
+
+    return "User updated", 200
