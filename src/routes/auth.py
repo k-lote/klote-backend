@@ -18,13 +18,18 @@ def register():
     name = request.json.get("name")
     cpf = request.json.get("cpf")
     phone = request.json.get("phone")
-    first_login = True
 
-    user = User_klote.query.filter_by(email=email).first()
+    check_email = User_klote.query.filter_by(email=email).first()
+    check_cpf = User_klote.query.filter_by(cpf=cpf).first()
+    check_phone = User_klote.query.filter_by(phone=phone).first()
 
     # validations
-    if user:
-        return "User already exists", 400
+    if check_email:
+        return "Email already registered", 400
+    if check_cpf:
+        return "CPF already registered", 400
+    if check_phone:
+        return "Phone already registered", 400
     if User_klote.validates_password(password)[0] is False:
         return User_klote.validates_password(password)[1], 400
     if User_klote.validates_email(email)[0] is False:
@@ -39,6 +44,7 @@ def register():
     new_user = User_klote(user_id, email, generate_password_hash(password, method='sha256'), name, cpf, phone)
     db.session.add(new_user)
     db.session.commit()
+
 
     return "User created", 201
 
