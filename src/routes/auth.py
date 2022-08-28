@@ -5,9 +5,6 @@ from .. import db
 
 auth = Blueprint("auth", __name__)
 
-@auth.route("/")
-def login():
-    return "ok"
 
 @auth.route("/register", methods=["POST"])
 def register():
@@ -114,3 +111,15 @@ def reset_password():
     db.session.commit()
 
     return "User updated", 200
+
+@auth.route("/login", methods=["POST"])
+def login():
+    email = request.json.get("email")
+    password = request.json.get("password")
+    
+    user = User_klote.query.filter_by(email=email).first()
+
+    if not user or not check_password_hash(user.password, password):
+        return "Invalid credentials", 400
+
+    return "Logged in", 200
