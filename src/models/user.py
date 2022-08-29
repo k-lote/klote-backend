@@ -3,8 +3,10 @@ from .. import db
 from .. import ma
 import re
 
+user_id_seq = db.Sequence('user_id_seq', metadata=db.MetaData())
+
 class User_klote(db.Model):
-    user_id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    user_id = db.Column(db.Integer, user_id_seq, primary_key=True, unique=True, )
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150), nullable=False)
     name = db.Column(db.String(150), nullable=False)
@@ -49,8 +51,8 @@ class User_klote(db.Model):
             return False, "Nome inválido"
         return True, None
     
-    def __init__(self, user_id, email, password, name, cpf, phone):
-        self.user_id = user_id
+    def __init__(self, email, password, name, cpf, phone):
+        #self.user_id = user_id
         self.email = email
         self.password = password
         self.name = name

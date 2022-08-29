@@ -1,15 +1,15 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from ..models.user import User_klote
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
 
 auth = Blueprint("auth", __name__)
-
+#localhost:5000/api/user/
 
 @auth.route("/register", methods=["POST"])
 def register():
     # Get data from json request
-    user_id = request.json.get("user_id")
+    #user_id = request.json.get("user_id")
     email = request.json.get("email")
     password = request.json.get("password")
     name = request.json.get("name")
@@ -38,7 +38,7 @@ def register():
     if User_klote.validates_name(name)[0] is False:
         return User_klote.validates_name(name)[1], 400
     
-    new_user = User_klote(user_id, email, generate_password_hash(password, method='sha256'), name, cpf, phone)
+    new_user = User_klote(email, generate_password_hash(password, method='sha256'), name, cpf, phone)
     db.session.add(new_user)
     db.session.commit()
 
@@ -116,10 +116,21 @@ def reset_password():
 def login():
     email = request.json.get("email")
     password = request.json.get("password")
-    
+
     user = User_klote.query.filter_by(email=email).first()
 
     if not user or not check_password_hash(user.password, password):
         return "Invalid credentials", 400
 
     return "Logged in", 200
+
+@auth.route("/get_user", methods=["POST"])
+def get_user():
+    user_id = request.json.get("user_id")
+
+    user = User_klote.query.filter_by(user_id=user_id).first()
+
+    if not user:
+        return "User not found", 400
+
+    return jsonify({"user_id": user.user_id, "email": user.email, "name": user.name, "cpf": user.cpf, "phone": user.phone}), 200
