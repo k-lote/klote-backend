@@ -1,11 +1,13 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify 
 from ..models.user import User_klote
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
+from ..helpers.emailSender import send_email_reset_password
 
 auth = Blueprint("auth", __name__)
-#localhost:5000/api/user/
+# base route: /api/user/ 
 
+# registra um novo usuario
 @auth.route("/register", methods=["POST"])
 def register():
     # Get data from json request
@@ -45,6 +47,20 @@ def register():
 
     return "User created", 201
 
+# login (alterar para retornar o token)
+@auth.route("/login", methods=["POST"])
+def login():
+    email = request.json.get("email")
+    password = request.json.get("password")
+
+    user = User_klote.query.filter_by(email=email).first()
+
+    if not user or not check_password_hash(user.password, password):
+        return "Invalid credentials", 400
+
+    return "Logged in", 200
+
+# deleta um usuario
 @auth.route("/delete", methods=["DELETE"])
 def delete():
     user_id = request.json.get("user_id")
@@ -58,6 +74,7 @@ def delete():
 
     return "User deleted", 200
 
+# atualiza os dados de um usuario (avaliar quais dados podem ser atualizados)
 @auth.route("/update", methods=["PUT"])
 def update():
     user_id = request.json.get("user_id")
@@ -94,6 +111,7 @@ def update():
 
     return "User updated", 200
 
+# reseta a senha do usuario
 @auth.route("/reset_password", methods=["PUT"])
 def reset_password():
     user_id = request.json.get("user_id")
@@ -112,25 +130,24 @@ def reset_password():
 
     return "User updated", 200
 
-@auth.route("/login", methods=["POST"])
-def login():
-    email = request.json.get("email")
-    password = request.json.get("password")
-
-    user = User_klote.query.filter_by(email=email).first()
-
-    if not user or not check_password_hash(user.password, password):
-        return "Invalid credentials", 400
-
-    return "Logged in", 200
-
-@auth.route("/get_user", methods=["POST"])
-def get_user():
-    user_id = request.json.get("user_id")
-
+# retorna os dados do usuario a partir do id
+@auth.route("/get_user/<int:user_id>", methods=["GET"])
+def get_user(user_id):
     user = User_klote.query.filter_by(user_id=user_id).first()
 
     if not user:
         return "User not found", 400
 
     return jsonify({"user_id": user.user_id, "email": user.email, "name": user.name, "cpf": user.cpf, "phone": user.phone}), 200
+
+# envia email para resetar a senha
+@auth.route("/send_email/<int:user_id>", methods=["GET"])
+def send_email(user_id):
+    user = User_klote.query.filter_by(user_id=user_id).first()
+
+    if not user:
+        return "User not found", 400
+
+    send_email_reset_password(user.email, user.name)
+
+    return "Email sent", 200
