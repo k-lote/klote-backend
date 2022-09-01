@@ -12,6 +12,12 @@ db = SQLAlchemy()
 ma = Marshmallow()
 
 def create_app():
+    from .models.user import User_klote
+    from .models.user import user_share_schema
+    from .models.user import users_share_schema
+
+    from .routes.auth import auth
+
     dotenv.load_dotenv(dotenv.find_dotenv())
     app = Flask(__name__)
     CORS(app)
@@ -24,14 +30,10 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
 
-    from .models.user import User_klote
-    from .models.user import user_share_schema
-    from .models.user import users_share_schema
-
-    from .routes.auth import auth
-    #from .routes.index import index
-
-    #app.register_blueprint(index)
     app.register_blueprint(auth, url_prefix="/api/user/")
+   
+    @app.route("/", methods=["GET"])
+    def index():
+        return "API is running", 200
 
     return app
