@@ -58,7 +58,7 @@ def login():
     if not user or not check_password_hash(user.password, password):
         return "Invalid credentials", 400
 
-    return "Logged in", 200
+    return jsonify({"user_id": user.user_id, "email": user.email, "name": user.name, "cpf": user.cpf, "phone": user.phone}), 200
 
 # deleta um usuario
 @auth.route("/delete", methods=["DELETE"])
@@ -141,13 +141,14 @@ def get_user(user_id):
     return jsonify({"user_id": user.user_id, "email": user.email, "name": user.name, "cpf": user.cpf, "phone": user.phone}), 200
 
 # envia email para resetar a senha
-@auth.route("/send_email/<int:user_id>", methods=["GET"])
-def send_email(user_id):
-    user = User_klote.query.filter_by(user_id=user_id).first()
+@auth.route("/send_email", methods=["POST"])
+def send_email():
+    email = request.json.get("email")
+    user = User_klote.query.filter_by(email=email).first()
 
     if not user:
         return "User not found", 400
 
-    send_email_reset_password(user.email, user.name)
+    send_email_reset_password("masj@cin.ufpe.br", user.name)
 
     return "Email sent", 200
