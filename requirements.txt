@@ -18,5 +18,4 @@ pyparsing==3.0.9
 python-dotenv==0.20.0
 six==1.16.0
 SQLAlchemy==1.4.40
-virtualenv==20.13.0+ds
 Werkzeug==2.2.2
