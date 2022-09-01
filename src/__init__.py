@@ -27,7 +27,9 @@ def create_app():
     from .models.user import users_share_schema
 
     from .routes.auth import auth
+    from .routes.index import index
 
+    app.register_blueprint(index)
     app.register_blueprint(auth, url_prefix="/api/user/")
 
     return app
