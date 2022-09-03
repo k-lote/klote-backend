@@ -69,7 +69,7 @@ def authenticate():
         token = jwt.encode({'user_id': user.user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)}, app.config['SECRET_KEY'])
         response = jsonify({'message': 'Login successful', 'token': token, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)})
         response.headers.add('Access-Control-Allow-Origin', '*')
-        return jsonify({'message': 'Login successful', 'token': token, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12), 'header': 'Access-Control-Allow-Origin: *'}), 200
+        return response, 200
     return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401
 
 # deleta um usuario
