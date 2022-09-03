@@ -1,8 +1,7 @@
-from flask import Flask, request, render_template, jsonify, Blueprint, blueprints
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
-from datetime import datetime
 import dotenv
 import os
 
@@ -11,18 +10,14 @@ dotenv.load_dotenv(dotenv.find_dotenv())
 db = SQLAlchemy()
 ma = Marshmallow()
 
-def create_app():
-    from .models.user import User_klote
-    from .models.user import user_share_schema
-    from .models.user import users_share_schema
+app = Flask(__name__)
+app.config.from_object('config')
 
-    from .routes.auth import auth
+def create_app():
+    from .routes.user import auth
 
     dotenv.load_dotenv(dotenv.find_dotenv())
-    app = Flask(__name__)
     CORS(app)
-    #app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-    #app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URI")
     app.config.update(
         SQLALCHEMY_DATABASE_URI=os.getenv("DATABASE_URI"),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,

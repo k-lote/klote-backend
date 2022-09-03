@@ -61,7 +61,7 @@ class User_klote(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ("id", "email", "created_at")
+        fields = ('user_id', 'email', 'name', 'cpf', 'phone')
 
-user_share_schema = UserSchema()
-users_share_schema = UserSchema(many=True)
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)

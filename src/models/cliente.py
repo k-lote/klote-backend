@@ -15,8 +15,13 @@ class Cliente(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, nome, cpf, telefone, email):
-        self.nome = nome
+    def __init__(self, endereco, status, telefone1, telefone2, cpf, nome, cnpj, razao_social, email):
+        self.endereco = endereco
+        self.status = status
+        self.telefone1 = telefone1
+        self.telefone2 = telefone2
         self.cpf = cpf
-        self.telefone = telefone
+        self.nome = nome
+        self.cnpj = cnpj
+        self.razao_social = razao_social
         self.email = email
