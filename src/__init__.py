@@ -17,7 +17,7 @@ def create_app():
     from .routes.user import auth
 
     dotenv.load_dotenv(dotenv.find_dotenv())
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
     app.config.update(
         SQLALCHEMY_DATABASE_URI=os.getenv("DATABASE_URI"),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
@@ -25,7 +25,7 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
 
-    app.register_blueprint(auth, url_prefix="/api/user/")
+    app.register_blueprint(auth, url_prefix="/user/")
    
     @app.route("/", methods=["GET"])
     def index():
