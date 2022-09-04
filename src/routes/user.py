@@ -9,8 +9,6 @@ import jwt
 from .. import app
 from ..helpers.autentication import token_required
 
-print(jwt.__version__)
-
 auth = Blueprint("auth", __name__)
 # base route: /api/user/ 
 
@@ -71,7 +69,8 @@ def authenticate():
         token = jwt.encode({'user_id': user.user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)}, app.config['SECRET_KEY'])
         response = jsonify({'message': 'Login successful', 'token': token, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)})
         response.headers.add('Access-Control-Allow-Origin', '*')
-        return response, 200
+        response.status_code = 200
+        return response
     return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401
 
 # deleta um usuario
