@@ -9,6 +9,8 @@ import jwt
 from .. import app
 from ..helpers.autentication import token_required
 
+print(jwt.__version__)
+
 auth = Blueprint("auth", __name__)
 # base route: /api/user/ 
 
