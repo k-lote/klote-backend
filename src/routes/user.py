@@ -1,6 +1,8 @@
 from unittest import result
 from flask import Blueprint, request, jsonify 
 from ..models.user import User_klote, user_schema, users_schema
+from ..models.loteamento import Loteamento
+from ..models.acesso import Acesso
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
 from ..helpers.emailSender import send_email_reset_password
@@ -17,10 +19,9 @@ auth = Blueprint("auth", __name__)
 def root(current_user):
     return jsonify({'message': f'Hello {current_user.name}'})
 
-# registra um novo usuario
 @auth.route("/register", methods=["POST"])
 def register():
-    # Get data from json request
+# register a new user
     email = request.json.get("email")
     password = request.json.get("password")
     name = request.json.get("name")
@@ -54,9 +55,9 @@ def register():
     except:
         return jsonify({"message": "Error creating user", "data": {}}), 500
 
-# login (alterar para retornar o token)
 @auth.route("/login", methods=["POST"])
 def authenticate():
+# login a user
     auth = request.authorization
     if not auth or not auth.username or not auth.password:
         return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401
@@ -66,16 +67,18 @@ def authenticate():
         return jsonify({'message': 'user not found"'}), 401
 
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'user_id': user.user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)}, app.config['SECRET_KEY'])
+        user_data = user_schema.dump(user)
+        token = jwt.encode({"user_data": user_schema.dump(user), 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)}, app.config['SECRET_KEY'])
         response = jsonify({'message': 'Login successful', 'token': token, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)})
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.status_code = 200
         return response
     return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401
 
-# deleta um usuario
+
 @auth.route("/delete/<id>", methods=["DELETE"])
 def delete(id):
+# delete a user
     user = User_klote.query.filter_by(user_id=id).first()
 
     if not user:
@@ -88,9 +91,9 @@ def delete(id):
     except:
         return jsonify({"message": "Error deleting user", "data": {}}), 500
 
-# atualiza os dados de um usuario (avaliar quais dados podem ser atualizados)
 @auth.route("/update/<id>", methods=["PUT"])
 def update(id):
+# update a user(avaliar quais dados podem ser atualizados)
     email = request.json.get("email")
     password = request.json.get("password")
     name = request.json.get("name")
@@ -155,3 +158,25 @@ def send_email():
     send_email_reset_password(user.email, user.name)
 
     return "Email sent", 200
+
+@auth.route("/add_access", methods=["POST"])
+def add_access():
+    user_id = request.json.get("user_id")
+    loteamento_id = request.json.get("loteamento_id")
+
+    user = User_klote.query.filter_by(user_id=user_id).first()
+    loteamento = Loteamento.query.filter_by(loteamento_id=loteamento_id).first()
+
+    if not user:
+        return "User not found", 400
+    if not loteamento:
+        return "Loteamento not found", 400
+    
+    try:
+        new_access = Acesso(user_id, loteamento_id)
+        db.session.add(new_access)
+        db.session.commit()
+        return jsonify({"message": "Access added", "data": {}}), 200
+    except:
+        return jsonify({"message": "Error adding access", "data": {}}), 500
+
