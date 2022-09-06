@@ -1,8 +1,8 @@
 from unittest import result
 from flask import Blueprint, request, jsonify 
 from ..models.user import User_klote, user_schema, users_schema
-from ..models.loteamento import Loteamento
-from ..models.acesso import Acesso
+from ..models.allotment import Loteamento
+from ..models.allotment_access import Acesso
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
 from ..helpers.emailSender import send_email_reset_password
@@ -180,3 +180,6 @@ def add_access():
     except:
         return jsonify({"message": "Error adding access", "data": {}}), 500
 
+@auth.route('/get_allotments/<int:user_id>', methods=['GET'])
+def get_allotments(user_id):
+    pass
