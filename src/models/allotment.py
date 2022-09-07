@@ -21,3 +21,10 @@ class Allotment(db.Model):
         self.cep = cep
         self.address = address
         self.img_url = img_url
+
+class AllotmentSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'name', 'cep', 'address', 'img_url')
+
+allotment_schema = AllotmentSchema()
+allotments_schema = AllotmentSchema(many=True)
