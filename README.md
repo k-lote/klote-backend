@@ -25,5 +25,3 @@ O projeto foi dividido em 3 repostiórios, sendo eles:
 
 
 ## Outras Informações
-
-## Licensa
