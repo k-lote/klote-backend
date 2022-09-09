@@ -9,7 +9,6 @@ __pycache__/
 Pipfile
 Pipfile.lock
 
-
 # Distribution / packaging
 .Python
 build/
