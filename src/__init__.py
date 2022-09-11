@@ -14,6 +14,7 @@ app = Flask(__name__)
 app.config.from_object('config')
 
 def create_app():
+    from .routes.allotment import allotment
     from .routes.user import auth
 
     dotenv.load_dotenv(dotenv.find_dotenv())
@@ -25,7 +26,8 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
 
-    app.register_blueprint(auth, url_prefix="/user/")
+    app.register_blueprint(auth, url_prefix="/user")
+    app.register_blueprint(allotment, url_prefix="/allotment")
    
     @app.route("/", methods=["GET"])
     def index():

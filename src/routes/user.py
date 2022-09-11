@@ -11,8 +11,7 @@ import jwt
 from .. import app
 from ..helpers.autentication import token_required
 
-auth = Blueprint("auth", __name__)
-# base route: /api/user/ 
+auth = Blueprint("auth", __name__) 
 
 @auth.route("/", methods=["GET"])
 @token_required
@@ -164,13 +163,13 @@ def send_email():
 
     return "Email sent", 200
 
-@auth.route("/add_access", methods=["POST"])
+@auth.route("/add_allotment_access", methods=["POST"])
 def add_access():
     user_id = request.json.get("user_id")
     loteamento_id = request.json.get("loteamento_id")
 
     user = User_klote.query.filter_by(user_id=user_id).first()
-    loteamento = Allotment.query.filter_by(loteamento_id=loteamento_id).first()
+    loteamento = Allotment.query.filter_by(id=loteamento_id).first()
 
     if not user:
         return "User not found", 400

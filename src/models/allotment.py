@@ -15,8 +15,7 @@ class Allotment(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, id, name, cep, address, img_url):
-        self.id = id
+    def __init__(self, name, cep, address, img_url):
         self.name = name
         self.cep = cep
         self.address = address
