@@ -11,6 +11,7 @@ def register():
     allotment_id = request.json.get('allotment_id')
     block = request.json.get('block')
     value = request.json.get('value')
+    status = request.json.get('status') or 'available'
 
     allotment = Allotment.query.filter_by(id=allotment_id).first()    
 
@@ -25,7 +26,7 @@ def register():
         last_number = last_number.number
         number = last_number + 1
     try:
-        new_lot = Lot(allotment_id, number, block, value)
+        new_lot = Lot(allotment_id, number, block, value, status)
         db.session.add(new_lot)
         db.session.commit()
 
