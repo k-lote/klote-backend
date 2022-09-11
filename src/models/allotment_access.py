@@ -10,3 +10,10 @@ class Allotment_access(db.Model):
     def __init__(self, user_id, allotment_id):
         self.user_id = user_id
         self.allotment_id = allotment_id
+
+class Allotment_accessSchema(ma.Schema):
+    class Meta:
+        fields = ('user_id', 'allotment_id')
+    
+allotment_access_schema = Allotment_accessSchema()
+allotments_access_schema = Allotment_accessSchema(many=True)

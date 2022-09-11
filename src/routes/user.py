@@ -1,8 +1,8 @@
 from unittest import result
 from flask import Blueprint, request, jsonify 
 from ..models.user import User_klote, user_schema, users_schema
-from ..models.allotment import Loteamento
-from ..models.allotment_access import Acesso
+from ..models.allotment import Allotment, allotment_schema, allotments_schema
+from ..models.allotment_access import Allotment_access, allotment_access_schema, allotments_access_schema
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
 from ..helpers.emailSender import send_email_reset_password
@@ -124,8 +124,8 @@ def update(id):
         if phone != None: user.phone = phone
 
         db.session.commit()
-        result = user_schema.dump(user)
-        return jsonify({"message": "User updated", "data": result}), 200
+        data = user_schema.dump(user)
+        return jsonify({"message": "User updated", "data": data}), 200
     except:
         return jsonify({"message": "Error updating user", "data": {}}), 500
 
@@ -137,14 +137,19 @@ def get_user(user_id):
     if not user:
         return "User not found", 400
 
-    return jsonify({"user_id": user.user_id, "email": user.email, "name": user.name, "cpf": user.cpf, "phone": user.phone}), 200
+    data = user_schema.dump(user)
+
+    return jsonify({"message": "User found", "data": data}), 200
 
 # retorna todos os usuarios
 @auth.route("/get_users", methods=["GET"])
 def get_users():
-    users = User_klote.query.all()
-    result = users_schema.dump(users)
-    return jsonify({"message": "Users found", "data": result}), 200
+    try:
+        users = User_klote.query.all()
+        result = users_schema.dump(users)
+        return jsonify({"message": "Users found", "data": result}), 200
+    except:
+        return jsonify({"message": "Error getting users", "data": {}}), 500
 
 # envia email para resetar a senha
 @auth.route("/send_email", methods=["POST"])
@@ -153,7 +158,7 @@ def send_email():
     user = User_klote.query.filter_by(email=email).first()
 
     if not user:
-        return "User not found", 400
+        return "User not found", 404
 
     send_email_reset_password(user.email, user.name)
 
@@ -165,7 +170,7 @@ def add_access():
     loteamento_id = request.json.get("loteamento_id")
 
     user = User_klote.query.filter_by(user_id=user_id).first()
-    loteamento = Loteamento.query.filter_by(loteamento_id=loteamento_id).first()
+    loteamento = Allotment.query.filter_by(loteamento_id=loteamento_id).first()
 
     if not user:
         return "User not found", 400
@@ -173,7 +178,7 @@ def add_access():
         return "Loteamento not found", 400
     
     try:
-        new_access = Acesso(user_id, loteamento_id)
+        new_access = Allotment_access(user_id, loteamento_id)
         db.session.add(new_access)
         db.session.commit()
         return jsonify({"message": "Access added", "data": {}}), 200
@@ -181,5 +186,14 @@ def add_access():
         return jsonify({"message": "Error adding access", "data": {}}), 500
 
 @auth.route('/get_allotments/<int:user_id>', methods=['GET'])
-def get_allotments(user_id):
-    pass
+def get_allotments_user(user_id):
+    user = User_klote.query.filter_by(user_id=user_id).first()
+    if not user:
+        return "User not found", 400
+
+    try:
+        acessos = Allotment_access.query.filter_by(user_id=user_id).all()
+        result = allotments_access_schema.dump(acessos)
+        return jsonify({"message": "Allotments found", "data": result}), 200
+    except:
+        return jsonify({"message": "Error getting allotments", "data": {}}), 500
