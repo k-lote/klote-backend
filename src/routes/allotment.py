@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify 
 from ..models.allotment import Allotment, allotment_schema, allotments_schema
+from ..models.user import User_klote
+from ..models.allotment_access import Allotment_access, allotment_access_schema, allotments_access_schema
 from .. import db
 
 allotment = Blueprint('allotment', __name__)
@@ -9,13 +11,29 @@ def register():
     name = request.json.get('name')
     cep = request.json.get('cep')
     address = request.json.get('address')
-    img_url = request.json.get('img_url')
+    img_url = request.json.get('img_url') or None
+    users_access = request.json.get('users_access') or None
     
     try:
         new_allotment = Allotment(name, cep, address, img_url)
         db.session.add(new_allotment)
         db.session.commit()
         result = allotment_schema.dump(new_allotment)
+        for user_id in users_access:
+            user = User_klote.query.filter_by(user_id=user_id).first()
+    
+            if not user:
+                return f"User {user_id} not found", 400
+
+            try:
+                allotment_id = result['id']
+                new_access = Allotment_access(user_id, allotment_id)
+                db.session.add(new_access)
+                db.session.commit()
+            except Exception as e:
+                print(e)
+                return "Error creating access", 500
+
         return jsonify({'message': 'Allotment created', 'data': result}), 201
     except:
         return jsonify({'message': 'Error creating allotment', 'data': {}}), 500

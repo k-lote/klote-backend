@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify 
-from ..models.cliente import Cliente
+from ..models.customer import Customer
 from .. import db
 
 client = Blueprint('client', __name__)
@@ -16,7 +16,7 @@ def register():
     razao_social = request.json.get('razao_social')
     email = request.json.get('email')
 
-    new_client = Cliente(endereco, status, telefone1, telefone2, cpf, nome, cnpj, razao_social, email)
+    new_client = Customer(endereco, status, telefone1, telefone2, cpf, nome, cnpj, razao_social, email)
     db.session.add(new_client)
     db.session.commit()
 
@@ -26,7 +26,7 @@ def register():
 def get_client():
     client_id = request.json.get('client_id')
 
-    client = Cliente.query.filter_by(id_cliente=client_id).first()
+    client = Customer.query.filter_by(id_cliente=client_id).first()
 
     if not client:
         return 'Client not found', 404

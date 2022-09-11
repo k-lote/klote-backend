@@ -184,6 +184,31 @@ def add_access():
     except:
         return jsonify({"message": "Error adding access", "data": {}}), 500
 
+@auth.route('/remove_allotment_access', methods=["DELETE"])
+def remove_access():
+    user_id = request.json.get("user_id")
+    allotment_id = request.json.get("allotment_id")
+
+    user = User_klote.query.filter_by(user_id=user_id).first()
+    allotment = Allotment.query.filter_by(id=allotment_id).first()
+
+    if not user:
+        return "User not found", 400
+    if not allotment:
+        return "allotment not found", 400
+    
+    access = Allotment_access.query.filter_by(user_id=user_id, allotment_id=allotment_id).first()
+
+    if not access:
+        return "Access not found", 400
+
+    try:
+        db.session.delete(access)
+        db.session.commit()
+        return jsonify({"message": "Access removed", "data": {}}), 200
+    except:
+        return jsonify({"message": "Error removing access", "data": {}}), 500
+
 @auth.route('/get_allotments/<int:user_id>', methods=['GET'])
 def get_allotments_user(user_id):
     user = User_klote.query.filter_by(user_id=user_id).first()
@@ -192,7 +217,10 @@ def get_allotments_user(user_id):
 
     try:
         acessos = Allotment_access.query.filter_by(user_id=user_id).all()
-        result = allotments_access_schema.dump(acessos)
+        allotments = []
+        for acesso in acessos:
+            allotments.append(Allotment.query.filter_by(id=acesso.allotment_id).first())
+        result = allotments_schema.dump(allotments)
         return jsonify({"message": "Allotments found", "data": result}), 200
     except:
         return jsonify({"message": "Error getting allotments", "data": {}}), 500

@@ -1,7 +1,7 @@
 from datetime import datetime
 from .. import db
 
-class Cliente(db.Model):
+class Customer(db.Model):
     id_cliente = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
     endereco = db.Column(db.String(150), nullable=False)
     status = db.Column(db.String(150), nullable=False)

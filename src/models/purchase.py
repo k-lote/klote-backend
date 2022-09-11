@@ -12,6 +12,3 @@ class Compra(db.Model):
         self.numero = numero
         self.cliente_id = cliente_id
         self.data_compra = data_compra
-
-    def __repr__(self):
-        return '<Compra %r>' % self.id
