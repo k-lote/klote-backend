@@ -1,8 +1,8 @@
 from unittest import result
 from flask import Blueprint, request, jsonify 
 from ..models.user import User_klote, user_schema, users_schema
-from ..models.allotment import Allotment, allotment_schema, allotments_schema
-from ..models.allotment_access import Allotment_access, allotment_access_schema, allotments_access_schema
+from ..models.allotment import Allotment, allotments_schema
+from ..models.allotment_access import Allotment_access
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
 from ..helpers.emailSender import send_email_reset_password

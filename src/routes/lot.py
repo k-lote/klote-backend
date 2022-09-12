@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify 
-from ..models.lot import Lot, lot_schema
+from ..models.lot import Lot, lot_schema, lots_schema, LotHistory, lot_history_schema, lots_history_schema
 from ..models.allotment import Allotment
-from ..models.lot_history import LotHistory, lot_history_schema, lots_history_schema
 from .. import db
 from .. import ma
 
