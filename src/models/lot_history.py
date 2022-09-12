@@ -1,15 +1,25 @@
 from datetime import datetime
-from .. import db
+from .. import db, ma
 
-class Lote_historico(db.Model):
-    id_historico = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
-    loteamento_id = db.Column(db.Integer, db.ForeignKey('loteamento.loteamento_id'), nullable=False)
-    numero = db.Column(db.Integer, nullable=False)
-    descricao = db.Column(db.String(150), nullable=False)
+lot_history_id_seq = db.Sequence('lot_history_id_seq')
+
+class LotHistory(db.Model):
+    __tablename__ = 'lot_history'
+    id = db.Column(db.Integer, lot_history_id_seq ,primary_key=True, nullable=False)
+    allotment_id = db.Column(db.Integer, db.ForeignKey('lot.allotment_id'), nullable=False)
+    number = db.Column(db.Integer, db.ForeignKey('lot.number') , nullable=False)
+    description = db.Column(db.String(240), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, loteamento_id, numero, descricao):
-        self.loteamento_id = loteamento_id
-        self.numero = numero
-        self.descricao = descricao
+    def __init__(self, allotment_id, number, description):
+        self.allotment_id = allotment_id
+        self.number = number
+        self.description = description
+    
+class Lot_historySchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'allotment_id', 'number', 'description')
+
+lot_history_schema = Lot_historySchema()
+lots_history_schema = Lot_historySchema(many=True)

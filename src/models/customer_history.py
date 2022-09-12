@@ -1,14 +1,20 @@
 from datetime import datetime
-from .. import db
+from .. import db,ma
 
-class Cliente_historico(db.Model):
-    id_historico = db.Column(db.Integer, primary_key=True)
-    descricao = db.Column(db.String(255))
-    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'))
+class CustomerHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    costumer_id = db.Column(db.Integer, db.ForeignKey('costumer.id'), nullable=False)
+    description = db.Column(db.String(240), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, descricao, cliente_id):
-        self.descricao = descricao
-        self.cliente_id = cliente_id
+    def __init__(self, costumer_id, description):
+        self.costumer_id = costumer_id
+        self.description = description
+    
+class CustomerHistorySchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'costumer_id', 'description')
 
-    def __repr__(self):
-        return '<Cliente_historico %r>' % self.id
+customer_history_schema = CustomerHistorySchema()
+customers_history_schema = CustomerHistorySchema(many=True)

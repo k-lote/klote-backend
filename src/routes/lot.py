@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify 
 from ..models.lot import Lot, lot_schema
 from ..models.allotment import Allotment
+from ..models.lot_history import LotHistory, lot_history_schema, lots_history_schema
 from .. import db
 from .. import ma
 
@@ -87,3 +88,67 @@ def delete(number):
         return jsonify({"message": "Lot deleted", "data": {}}), 200
     except:
         return jsonify({"message": "Error deleting lot", "data": {}}), 500
+
+#LOT HISTORY
+@lot.route('/history/register', methods=['POST'])
+def history_register():
+    allotment_id = request.json.get('allotment_id')
+    number = request.json.get('number')
+    description = request.json.get('description')
+    
+    lot = Lot.query.filter_by(allotment_id=allotment_id, number=number).first()
+
+    if not lot:
+        return 'Lot not found', 400
+
+    try:
+        new_lot_history = LotHistory(allotment_id, number, description)
+        db.session.add(new_lot_history)
+        db.session.commit()
+
+        return jsonify({'message': 'Lot history created successfully', 'data': lot_history_schema.dump(new_lot_history)}), 201
+    except:
+        return 'An error ocurred creating the lot history', 500
+
+@lot.route('/history/get_lot_history/', methods=['GET'])
+def get_lot_history():
+    allotment_id = request.json.get('allotment_id')
+    number = request.json.get('number')
+    lot_history = LotHistory.query.filter_by(allotment_id=allotment_id, number=number).all()
+
+    if not lot_history:
+        return 'Lot history not found', 400
+
+    return jsonify({'lot_history': lots_history_schema.dump(lot_history, many=True)}), 200
+
+@lot.route('/history/update/<int:id>', methods=['PUT'])
+def history_update(id):
+    description = request.json.get('description')
+
+    lot_history = LotHistory.query.filter_by(id=id).first()
+
+    if not lot_history:
+        return jsonify({"message": "Lot history not found", "data": {}}), 404
+    try:
+        if description != None: lot_history.description = description
+
+        db.session.commit()
+        result = lot_history_schema.dump(lot_history)
+        return jsonify({"message": "Lot history updated", "data": result}), 200
+    except:
+        return jsonify({"message": "Error updating lot history", "data": {}}), 500
+
+@lot.route('/history/delete/', methods=['DELETE'])
+def history_delete(id):
+    id = request.json.get('id')
+    lot_history = LotHistory.query.filter_by(id=id).first()
+
+    if not lot_history:
+        return jsonify({"message": "Lot history not found", "data": {}}), 404
+
+    try:
+        db.session.delete(lot_history)
+        db.session.commit()
+        return jsonify({"message": "Lot history deleted", "data": {}}), 200
+    except:
+        return jsonify({"message": "Error deleting lot history", "data": {}}), 500

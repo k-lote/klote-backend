@@ -1,14 +1,21 @@
 from datetime import datetime
-from .. import db
+from .. import db, ma
 
-class Compra(db.Model):
-    loteamento_id = db.Column(db.Integer, db.ForeignKey('lote.loteamento_id'), primary_key=True)
-    numero = db.Column(db.Integer, db.ForeignKey('lote.numero') ,primary_key=True)
-    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.cliente_id'))
-    data_compra = db.Column(db.DateTime)
+class Purcharse(db.Model):
+    allotment_id = db.Column(db.Integer, db.ForeignKey('lot.allotment_id'), primary_key=True, nullable=False)
+    number = db.Column(db.Integer, db.ForeignKey('lot.number'), primary_key=True, nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    date_purchase = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, loteamento_id, numero, cliente_id, data_compra):
-        self.loteamento_id = loteamento_id
-        self.numero = numero
-        self.cliente_id = cliente_id
-        self.data_compra = data_compra
+    def __init__(self, allotment_id, number, customer_id, date_purchase):
+        self.allotment_id = allotment_id
+        self.number = number
+        self.customer_id = customer_id
+        self.date_purchase = date_purchase
+
+class PurcharseSchema(ma.Schema):
+    class Meta:
+        fields = ('allotment_id', 'number', 'customer_id', 'date_purchase')
+    
+purcharse_schema = PurcharseSchema()
+purcharse_schemas = PurcharseSchema(many=True)
