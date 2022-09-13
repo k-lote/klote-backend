@@ -9,7 +9,7 @@ from ..helpers.emailSender import send_email_reset_password, send_email_new_gues
 import datetime
 import jwt
 from .. import app
-from ..helpers.autentication import token_required
+from ..helpers.autentication import token_required, admin_required
 from ..helpers.random_password import random_password
 
 auth = Blueprint("auth", __name__) 
@@ -77,7 +77,8 @@ def register_admin():
     except:
         return jsonify({"message": "Error creating user", "data": {}}), 500
 
-@auth.route("/register_guest", methods=["POST"])
+@auth.route("/register_guest", methods=["POST"], strict_slashes=False)
+#@admin_required
 def register_guest():
     email = request.json.get("email")
     password = random_password()
