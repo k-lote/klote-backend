@@ -78,7 +78,7 @@ def register_admin():
         return jsonify({"message": "Error creating user", "data": {}}), 500
 
 @auth.route("/register_guest", methods=["POST"], strict_slashes=False)
-#@admin_required
+@admin_required
 def register_guest():
     email = request.json.get("email")
     password = random_password()

@@ -37,14 +37,17 @@ def token_required(f):
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        email_request = request.json.get('email_request')
-        if not email_request:
-            return jsonify({'message': 'email_request is missing', 'data': []}), 401
+        token = request.json.get('token')
+        if not token:
+            return jsonify({'message': 'token is missing', 'data': []}), 401
+        
         try:
-            user = User_klote.query.filter_by(email=email_request).first()
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            email = data['user_data']['email']
+            user = User_klote.query.filter_by(email=email).first()
             if not user.is_admin:
                 return jsonify({'message': 'user is not admin', 'data': []}), 401
         except:
-            return jsonify({'message': 'could not verify user', 'data': []}), 401
+           return jsonify({'message': 'could not verify user', 'data': []}), 401
         return f(*args, **kwargs)
     return decorated
