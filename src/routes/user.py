@@ -5,11 +5,12 @@ from ..models.allotment import Allotment, allotments_schema
 from ..models.allotment_access import Allotment_access
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
-from ..helpers.emailSender import send_email_reset_password
+from ..helpers.emailSender import send_email_reset_password, send_email_new_guest
 import datetime
 import jwt
 from .. import app
 from ..helpers.autentication import token_required
+from ..helpers.random_password import random_password
 
 auth = Blueprint("auth", __name__) 
 
@@ -17,42 +18,6 @@ auth = Blueprint("auth", __name__)
 @token_required
 def root(current_user):
     return jsonify({'message': f'Hello {current_user.name}'})
-
-@auth.route("/register", methods=["POST"])
-def register():
-# register a new user
-    email = request.json.get("email")
-    password = request.json.get("password")
-    name = request.json.get("name")
-    cpf = request.json.get("cpf")
-    phone = request.json.get("phone")
-
-    # validations
-    if User_klote.query.filter_by(email=email).first():
-        return "Email already registered", 400
-    if User_klote.query.filter_by(cpf=cpf).first():
-        return "CPF already registered", 400
-    if User_klote.query.filter_by(phone=phone).first():
-        return "Phone already registered", 400
-    if User_klote.validates_password(password)[0] is False:
-        return User_klote.validates_password(password)[1], 400
-    if User_klote.validates_email(email)[0] is False:
-        return User_klote.validates_email(email)[1], 400
-    if User_klote.validates_cpf(cpf)[0] is False:
-        return User_klote.validates_cpf(cpf)[1], 400
-    if User_klote.validates_phone(phone)[0] is False:
-        return User_klote.validates_phone(phone)[1], 400
-    if User_klote.validates_name(name)[0] is False:
-        return User_klote.validates_name(name)[1], 400
-    
-    try:
-        new_user = User_klote(email, generate_password_hash(password, method='sha256'), name, cpf, phone)
-        db.session.add(new_user)
-        db.session.commit()
-        result = user_schema.dump(new_user)
-        return jsonify({"message": "User created", "data": result}), 201
-    except:
-        return jsonify({"message": "Error creating user", "data": {}}), 500
 
 @auth.route("/login", methods=["POST"])
 def authenticate():
@@ -74,6 +39,78 @@ def authenticate():
         return response
     return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic auth="Login required"'}), 401
 
+@auth.route("/register_admin", methods=["POST"])
+def register_admin():
+# register a new user
+    email = request.json.get("email")
+    password = request.json.get("password")
+    name = request.json.get("name")
+    cpf = request.json.get("cpf")
+    phone = request.json.get("phone")
+    first_login = False
+    is_admin = True
+
+    # validations
+    if User_klote.query.filter_by(email=email).first():
+        return "Email already registered", 400
+    if User_klote.query.filter_by(cpf=cpf).first():
+        return "CPF already registered", 400
+    if User_klote.query.filter_by(phone=phone).first():
+        return "Phone already registered", 400
+    if User_klote.validates_password(password)[0] is False:
+        return User_klote.validates_password(password)[1], 400
+    if User_klote.validates_email(email)[0] is False:
+        return User_klote.validates_email(email)[1], 400
+    if User_klote.validates_cpf(cpf)[0] is False:
+        return User_klote.validates_cpf(cpf)[1], 400
+    if User_klote.validates_phone(phone)[0] is False:
+        return User_klote.validates_phone(phone)[1], 400
+    if User_klote.validates_name(name)[0] is False:
+        return User_klote.validates_name(name)[1], 400
+    
+    try:
+        new_user = User_klote(email, generate_password_hash(password, method='sha256'), name, cpf, phone, first_login, is_admin)
+        db.session.add(new_user)
+        db.session.commit()
+        result = user_schema.dump(new_user)
+        return jsonify({"message": "User created", "data": result}), 201
+    except:
+        return jsonify({"message": "Error creating user", "data": {}}), 500
+
+@auth.route("/register_guest", methods=["POST"])
+def register_guest():
+    email = request.json.get("email")
+    password = random_password()
+    name = request.json.get("name")
+    cpf = request.json.get("cpf")
+    phone = request.json.get("phone")
+    first_login = True
+
+    # validations
+    if User_klote.query.filter_by(email=email).first():
+        return "Email already registered", 400
+    if User_klote.query.filter_by(cpf=cpf).first():
+        return "CPF already registered", 400
+    if User_klote.query.filter_by(phone=phone).first():
+        return "Phone already registered", 400
+    if User_klote.validates_email(email)[0] is False:
+        return User_klote.validates_email(email)[1], 400
+    if User_klote.validates_cpf(cpf)[0] is False:
+        return User_klote.validates_cpf(cpf)[1], 400
+    if User_klote.validates_phone(phone)[0] is False:
+        return User_klote.validates_phone(phone)[1], 400
+    if User_klote.validates_name(name)[0] is False:
+        return User_klote.validates_name(name)[1], 400
+    
+    try:
+        new_user = User_klote(email, generate_password_hash(password, method='sha256'), name, cpf, phone, first_login)
+        db.session.add(new_user)
+        db.session.commit()
+        result = user_schema.dump(new_user)
+        send_email_new_guest(email, name, password)
+        return jsonify({"message": "Guest created", "data": result}), 201
+    except:
+        return jsonify({"message": "Error creating user", "data": {}}), 500
 
 @auth.route("/delete/<id>", methods=["DELETE"])
 def delete(id):

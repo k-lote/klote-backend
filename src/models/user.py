@@ -12,12 +12,10 @@ class User_klote(db.Model):
     name = db.Column(db.String(150), nullable=False)
     cpf = db.Column(db.String(11), unique=True)
     phone = db.Column(db.String(11), unique=True)
-    #first_login = db.Column(db.Boolean, nullable=False, default=True)
-    #is_admin = db.Column(db.Boolean, nullable=False, default=False)
-    #created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    #updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    #token = db.Column(db.String(150), unique=True)
-
+    first_login = db.Column(db.Boolean, nullable=False, default=True)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def validates_password(password):
         if len(password) < 8:
@@ -51,17 +49,18 @@ class User_klote(db.Model):
             return False, "Nome inválido"
         return True, None
     
-    def __init__(self, email, password, name, cpf, phone):
-        #self.user_id = user_id
+    def __init__(self, email, password, name, cpf, phone, first_login, is_admin = False):
         self.email = email
         self.password = password
         self.name = name
         self.cpf = cpf
         self.phone = phone
+        self.first_login = first_login
+        self.is_admin = is_admin
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ('user_id', 'email', 'name', 'cpf', 'phone')
+        fields = ('user_id', 'email', 'name', 'cpf', 'phone', 'is_admin', 'created_at', 'updated_at')
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
