@@ -2,7 +2,7 @@
 
 O projeto faz parte da avaliação principal das disciplinas **IF977- ENGENHARIA DE SOFTWARE** e integrado à **IF976- BANCO DE DADOS** do Centro de Informática da UFPE. 
 
-O projeto foi dividido em 3 repostiórios, sendo eles:
+O projeto foi dividido em 3 repositórios, sendo eles:
 
 📌[Front-end](https://github.com/Jailsonsdsj/projeto-ES-front)
 
