@@ -22,7 +22,7 @@ Desenvolvimento de uma ferramenta que possibilite o gerenciamento dos lotes que 
 
 ## 👨‍🏫 Professor responsável
 
-[Vinicius Cardoso Garcia](https://viniciusgarcia.me/) - [vcg@cin.ufpe.br]()
+- [Vinicius Cardoso Garcia](https://viniciusgarcia.me/) (vcg@cin.ufpe.br)
 
 ## 👥 Autores
 - Davi Novaes (dln@cin.ufpe.br) - [github](https://github.com/davinovaes)
