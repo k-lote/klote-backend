@@ -14,7 +14,10 @@ app = Flask(__name__)
 app.config.from_object('config')
 
 def create_app():
+    from .routes.allotment import allotment
     from .routes.user import auth
+    from .routes.lot import lot
+    from .routes.customer import customer
 
     dotenv.load_dotenv(dotenv.find_dotenv())
     CORS(app, resources={r"/*": {"origins": "*"}})
@@ -25,7 +28,10 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
 
-    app.register_blueprint(auth, url_prefix="/user/")
+    app.register_blueprint(auth, url_prefix="/user")
+    app.register_blueprint(allotment, url_prefix="/allotment")
+    app.register_blueprint(lot, url_prefix="/lot")
+    app.register_blueprint(customer, url_prefix="/customer")
    
     @app.route("/", methods=["GET"])
     def index():
