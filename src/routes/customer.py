@@ -14,9 +14,12 @@ def register():
     name = request.json.get('name')
     cnpj = request.json.get('cnpj') or None
     corporate_name = request.json.get('corporate_name') or None
+    admin_id = request.json.get('admin_id')
+    email = request.json.get('email')
+
 
     try:
-        new_customer = Customer(address, status, phone1, phone2, cpf, name, cnpj, corporate_name)
+        new_customer = Customer(admin_id, address, status, phone1, phone2, cpf, name, cnpj, corporate_name, email)
         db.session.add(new_customer)
         db.session.commit()
 
@@ -41,6 +44,7 @@ def get_customers():
         return 'Customers not found', 400
 
     return jsonify({'customers': customers_schema.dump(customers)}), 200
+
 
 @customer.route('/update/<int:id>', methods=['PUT'])
 def update(id):

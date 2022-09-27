@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from ..models.user import User_klote, user_schema, users_schema
 from ..models.allotment import Allotment, allotments_schema
 from ..models.allotment_access import Allotment_access
+from ..models.lot import Lot, lot_schema, lots_schema
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
 from ..helpers.emailSender import send_email_reset_password, send_email_new_guest
@@ -204,10 +205,10 @@ def send_email():
 @auth.route("/add_allotment_access", methods=["POST"])
 def add_access():
     user_id = request.json.get("user_id")
-    loteamento_id = request.json.get("loteamento_id")
+    allotment_id = request.json.get("allotment_id")
 
     user = User_klote.query.filter_by(user_id=user_id).first()
-    loteamento = Allotment.query.filter_by(id=loteamento_id).first()
+    loteamento = Allotment.query.filter_by(id=allotment_id).first()
 
     if not user:
         return "User not found", 400
@@ -215,7 +216,7 @@ def add_access():
         return "Loteamento not found", 400
     
     try:
-        new_access = Allotment_access(user_id, loteamento_id)
+        new_access = Allotment_access(user_id, allotment_id)
         db.session.add(new_access)
         db.session.commit()
         return jsonify({"message": "Access added", "data": {}}), 200
@@ -254,11 +255,20 @@ def get_allotments_user(user_id):
         return "User not found", 400
 
     try:
-        acessos = Allotment_access.query.filter_by(user_id=user_id).all()
+        access = Allotment_access.query.filter_by(user_id=user_id).all()
         allotments = []
-        for acesso in acessos:
-            allotments.append(Allotment.query.filter_by(id=acesso.allotment_id).first())
+        for allotment in access:
+            allotment_info = Allotment.query.filter_by(id=allotment.allotment_id).first()
+            allotments.append(allotment_info)
         result = allotments_schema.dump(allotments)
+        for allotment in result:
+            allotment["lots"] = {}
+            lots = Lot.query.filter_by(allotment_id=allotment['id']).all()
+            lots_data = lots_schema.dump(lots)
+            for lot in lots_data:
+                allotment['lots'][lot['number']] = lot['status']
+
         return jsonify({"message": "Allotments found", "data": result}), 200
-    except:
+    except Exception as e:
+        print(e)
         return jsonify({"message": "Error getting allotments", "data": {}}), 500
