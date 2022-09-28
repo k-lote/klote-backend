@@ -34,14 +34,22 @@ def register():
     except:
         return 'An error ocurred creating the lot', 500
 
-@lot.route('/get_lot/<int:allotment_id>', methods=['GET'])
-def get_lot(number):
-    lot = Lot.query.filter_by(number=number).first()
+@lot.route('/get_lot', methods=['POST'])
+def get_lot():
+    allotment_id = request.json.get('allotment_id')
+    number = request.json.get('number')
+    lot = Lot.query.filter_by(allotment_id=allotment_id, number=number).first()
 
     if not lot:
         return 'Lot not found', 400
 
-    return jsonify({'number': lot.number, 'block': lot.block, 'value': lot.value}), 200
+    result = lot_schema.dump(lot)
+    result['history'] = {}
+    lot_history = LotHistory.query.filter_by(allotment_id=allotment_id, number=number).all()
+    lot_history_dump = lots_history_schema.dump(lot_history)
+    for history in lot_history_dump:
+        result['history'][history['id']] = history
+    return jsonify({"data": result, "message": "Lot found"}), 200
 
 @lot.route('/get_lots/<int:allotment_id>', methods=['GET'])
 def get_lots(allotment_id):

@@ -40,7 +40,7 @@ class LotHistory(db.Model):
     
 class Lot_historySchema(ma.Schema):
     class Meta:
-        fields = ('id', 'allotment_id', 'number', 'description')
+        fields = ('id', 'allotment_id', 'number', 'description', 'created_at')
 
 lot_history_schema = Lot_historySchema()
 lots_history_schema = Lot_historySchema(many=True)
