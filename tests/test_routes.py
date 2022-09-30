@@ -5,6 +5,7 @@ sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
 from src import create_app
 from src.models.user import User_klote
+from src.routes.allotment import register
 
 #Testar se API inicia com sucesso
 def test_init_server(test_client):

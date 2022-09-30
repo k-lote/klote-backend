@@ -49,7 +49,7 @@ class User_klote(db.Model):
             return False, "Nome inválido"
         return True, None
     
-    def __init__(self, email, password, name, cpf, phone, first_login, is_admin = False):
+    def __init__(self, email, password, name, cpf, phone, first_login = True, is_admin = False):
         self.email = email
         self.password = password
         self.name = name

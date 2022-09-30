@@ -151,4 +151,3 @@ def delete_purcharse(id):
         return jsonify({'message': 'Purcharse deleted successfully'}), 200
     except:
         return jsonify({'message': 'An error occurred'}), 500
-
