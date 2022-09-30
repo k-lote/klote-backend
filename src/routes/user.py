@@ -125,6 +125,10 @@ def delete(id):
     try:
         db.session.delete(user)
         db.session.commit()
+        allotment_access = Allotment_access.query.filter_by(user_id=id).all()
+        for access in allotment_access:
+            db.session.delete(access)
+            db.session.commit()
         return jsonify({"message": "User deleted", "data": {}}), 200
     except:
         return jsonify({"message": "Error deleting user", "data": {}}), 500

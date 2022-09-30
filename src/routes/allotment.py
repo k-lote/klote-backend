@@ -82,7 +82,7 @@ def update(id):
 
 @allotment.route('/delete/<id>', methods=['DELETE'])
 def delete(id):
-    allotment = Allotment.query.filter_by(allotment_id=id).first()
+    allotment = Allotment.query.filter_by(id=id).first()
 
     if not allotment:
         return jsonify({"message": "Allotment not found", "data": {}}), 404
@@ -90,6 +90,11 @@ def delete(id):
     try:
         db.session.delete(allotment)
         db.session.commit()
+        allotment_access = Allotment_access.query.filter_by(allotment_id=id).all()
+        for access in allotment_access:
+            db.session.delete(access)
+            db.session.commit()
+
         return jsonify({"message": "Allotment deleted", "data": {}}), 200
     except:
         return jsonify({"message": "Error deleting allotment", "data": {}}), 500

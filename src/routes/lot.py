@@ -31,7 +31,8 @@ def register():
         db.session.commit()
 
         return jsonify({'message': 'Lot created successfully', 'data': lot_schema.dump(new_lot)}), 201
-    except:
+    except Exception as e:
+        print(e)
         return 'An error ocurred creating the lot', 500
 
 @lot.route('/get_lot', methods=['POST'])
