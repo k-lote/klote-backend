@@ -171,6 +171,31 @@ def update(id):
     except:
         return jsonify({"message": "Error updating user", "data": {}}), 500
 
+@auth.route("/update_password", methods=["PUT"])
+def update_password():
+    current_password = request.json.get("current_password")
+    new_password = request.json.get("new_password")
+    user_id = request.json.get("user_id")
+
+    user = User_klote.query.filter_by(user_id=user_id).first()
+
+    if not user:
+        return jsonify({"message": "User not found", "data": {}}), 404
+
+    if not check_password_hash(user.password, current_password):
+        return jsonify({"message": "Wrong password", "data": {}}), 400
+
+    if User_klote.validates_password(new_password)[0] is False:
+        return User_klote.validates_password(new_password)[1], 400
+
+    try:
+        user.password = generate_password_hash(new_password, method='sha256')
+        db.session.commit()
+        data = user_schema.dump(user)
+        return jsonify({"message": "User updated", "data": data}), 200
+    except:
+        return jsonify({"message": "Error updating user", "data": {}}), 500
+
 # retorna os dados do usuario a partir do id
 @auth.route("/get_user/<int:user_id>", methods=["GET"])
 def get_user(user_id):
