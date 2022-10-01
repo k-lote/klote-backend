@@ -2,6 +2,7 @@ from crypt import methods
 from flask import Blueprint, request, jsonify 
 from ..models.lot import Lot, lot_schema, lots_schema, LotHistory, lot_history_schema, lots_history_schema
 from ..models.allotment import Allotment
+from ..models.customer import Purchase, Customer, customer_schema
 from .. import db
 from .. import ma
 
@@ -40,18 +41,28 @@ def register():
 def get_lot():
     allotment_id = request.json.get('allotment_id')
     number = request.json.get('number')
-    lot = Lot.query.filter_by(allotment_id=allotment_id, number=number).first()
 
-    if not lot:
-        return 'Lot not found', 400
+    try:
+        lot = Lot.query.filter_by(allotment_id=allotment_id, number=number).first()
+        if not lot:
+            return 'Lot not found', 400
 
-    result = lot_schema.dump(lot)
-    result['history'] = {}
-    lot_history = LotHistory.query.filter_by(allotment_id=allotment_id, number=number).all()
-    lot_history_dump = lots_history_schema.dump(lot_history)
-    for history in lot_history_dump:
-        result['history'][history['id']] = history
-    return jsonify({"data": result, "message": "Lot found"}), 200
+        result = lot_schema.dump(lot)
+        result['history'] = {}
+        lot_history = LotHistory.query.filter_by(allotment_id=allotment_id, number=number).all()
+        lot_history_dump = lots_history_schema.dump(lot_history)
+        for history in lot_history_dump:
+            result['history'][history['id']] = history
+
+        if lot.is_available == False:
+            customer_purchase = Purchase.query.filter_by(allotment_id=allotment_id, lot_number=number).first()
+            customer = Customer.query.filter_by(id=customer_purchase.customer_id).first()
+            result['customer'] = customer_schema.dump(customer)
+
+        return jsonify({"data": result, "message": "Lot found"}), 200
+    except Exception as e:
+        print(e)
+        return 'An error ocurred getting the lot', 500
 
 @lot.route('/get_lots', methods=['GET'])
 def get_all_lots():
