@@ -7,7 +7,7 @@ class Customer(db.Model):
     id = db.Column(db.Integer, customer_id_seq, primary_key=True, unique=True, autoincrement=True)
     admin_id = db.Column(db.Integer, db.ForeignKey('user_klote.user_id'), nullable=False)
     address = db.Column(db.String(150), nullable=False)
-    status = db.Column(db.String(20), nullable=False, default='active')
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
     phone1 = db.Column(db.String(20), nullable=False)
     phone2 = db.Column(db.String(20))
     cpf = db.Column(db.String(20))
@@ -18,10 +18,10 @@ class Customer(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, admin_id, address, status, phone1, phone2, cpf, name, cnpj, corporate_name, email):
+    def __init__(self, admin_id, address, phone1, phone2, cpf, name, cnpj, corporate_name, email, is_active=True):
         self.admin_id = admin_id
         self.address = address
-        self.status = status
+        self.is_active = is_active
         self.phone1 = phone1
         self.phone2 = phone2
         self.cpf = cpf
@@ -49,6 +49,24 @@ class CustomerHistorySchema(ma.Schema):
     class Meta:
         fields = ('id', 'costumer_id', 'description')
 
+class Purchase(db.Model):
+    allotment_id = db.Column(db.Integer, db.ForeignKey('lot.allotment_id'), primary_key=True, nullable=False)
+    lot_number = db.Column(db.Integer, db.ForeignKey('lot.number'), primary_key=True, nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    date_purchase = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __init__(self, allotment_id, lot_number, customer_id, date_purchase = None):
+        self.allotment_id = allotment_id
+        self.lot_number = lot_number
+        self.customer_id = customer_id
+        if date_purchase is not None: self.date_purchase = date_purchase
+
+class PurchaseSchema(ma.Schema):
+    class Meta:
+        fields = ('allotment_id', 'number', 'customer_id', 'date_purchase')
+    
+purchase_schema = PurchaseSchema()
+purchase_schemas = PurchaseSchema(many=True)
 customer_history_schema = CustomerHistorySchema()
 customers_history_schema = CustomerHistorySchema(many=True)
 customer_schema = CustomerSchema()

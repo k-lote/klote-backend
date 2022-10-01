@@ -1,13 +1,17 @@
-from flask import Blueprint, request, jsonify 
-from ..models.customer import Customer, customer_schema, customers_schema, CustomerHistory, customer_history_schema, customers_history_schema
+from flask import Blueprint, request, jsonify
+
+from src.models.allotment import Allotment 
+from ..models.customer import Customer, customer_schema, customers_schema, CustomerHistory, customer_history_schema, customers_history_schema, Purchase, purchase_schema, purchase_schemas
+from ..models.user import User_klote
+from ..models.lot import Lot
 from .. import db
+import datetime
 
 customer = Blueprint('client', __name__)
 
 @customer.route('/register', methods=['POST'])
 def register():
     address = request.json.get('address')
-    status = request.json.get('status') or 'active'
     phone1 = request.json.get('phone1')
     phone2 = request.json.get('phone2') or None
     cpf = request.json.get('cpf') or None
@@ -17,14 +21,21 @@ def register():
     admin_id = request.json.get('admin_id')
     email = request.json.get('email')
 
+    if not address or not phone1 or not name or not admin_id or not email:
+        return jsonify({'msg': 'Missing arguments'}), 400
 
     try:
-        new_customer = Customer(admin_id, address, status, phone1, phone2, cpf, name, cnpj, corporate_name, email)
-        db.session.add(new_customer)
-        db.session.commit()
+        new_customer = Customer(admin_id, address, phone1, phone2, cpf, name, cnpj, corporate_name, email)
+
+        admin = User_klote.query.filter_by(user_id=admin_id).first()
+        
+        if admin:
+            db.session.add(new_customer)
+            db.session.commit()
 
         return jsonify({'message': 'Customer created successfully', 'data': customer_schema.dump(new_customer)}), 201
-    except:
+    except Exception as e:
+        print(e)
         return 'An error ocurred creating the customer', 500
 
 @customer.route('/get_customer/<int:id>', methods=['GET'])
@@ -43,8 +54,7 @@ def get_customers():
     if not customers:
         return 'Customers not found', 400
 
-    return jsonify({'customers': customers_schema.dump(customers)}), 200
-
+    return jsonify({'data': customers_schema.dump(customers)}), 200
 
 @customer.route('/update/<int:id>', methods=['PUT'])
 def update(id):
@@ -164,3 +174,83 @@ def delete_history(id):
         return jsonify({'message': 'Customer history deleted successfully', 'data': customer_history_schema.dump(customer_history)}), 200
     except:
         return 'An error ocurred deleting the customer history', 500
+
+# CUSTOMER PURCHASE
+@customer.route('/purchase/register', methods=['POST'])
+def register_purchase():
+    customer_id = request.json.get('customer_id')
+    lot_number = request.json.get('lot_number')
+    allotment_id = request.json.get('allotment_id')
+    date = request.json.get('date') or None
+
+    try:
+        new_customer_purchase = Purchase(allotment_id, lot_number, customer_id, date)
+
+        try:
+            lot = Lot.query.filter_by(allotment_id=allotment_id, number=lot_number).first()
+
+            if not lot:
+                return jsonify({"message": "Lot not found", "data": {}}), 404
+            
+            if lot.is_available == False:
+                return jsonify({"message": "Lot is not available", "data": {}}), 404
+
+            lot.is_available = False
+            db.session.commit()
+        except:
+            return 'An error ocurred updating the lot', 500
+
+        db.session.add(new_customer_purchase)
+        db.session.commit()
+
+        return jsonify({'message': 'Customer purchase created successfully', 'data': purchase_schema.dump(new_customer_purchase)}), 201
+    except:
+        return 'An error ocurred creating the customer purchase', 500
+
+@customer.route('/purchase/get_customer_purchase/<int:id>', methods=['GET'])
+def get_customer_purchase(id):
+    customer_purchase = Purchase.query.filter_by(customer_id=id).first()
+
+    if not customer_purchase:
+        return 'Customer purchase not found', 400
+
+    return jsonify({'customer_purchase': purchase_schemas.dump(customer_purchase)}), 200
+
+@customer.route('/purchase/get_customers_purchases', methods=['GET'])
+def get_customers_purchases():
+    customers_purchases = Purchase.query.all()
+
+    if not customers_purchases:
+        return 'Customers purchases not found', 400
+
+    return jsonify({'customers_purchases': purchase_schemas.dump(customers_purchases)}), 200
+
+@customer.route('/purchase/delete/<int:id>', methods=['DELETE'])
+def delete_purchase():
+    allotment_id = request.json.get('allotment_id')
+    lot_number = request.json.get('lot_number')
+    customer_id = request.json.get('customer_id')
+    
+    customer_purchase = Purchase.query.filter_by(allotment_id=allotment_id, lot_number=lot_number, customer_id=customer_id).first()
+
+    if not customer_purchase:
+        return jsonify({"message": "Customer purchase not found", "data": {}}), 404
+
+    try:
+        try:
+            lot = Lot.query.filter_by(allotment_id=allotment_id, number=lot_number).first()
+            
+            if not lot:
+                return jsonify({"message": "Lot not found", "data": {}}), 404
+
+            lot.is_available = True
+            db.session.commit()
+        except:
+            return 'An error ocurred updating the lot', 500
+
+        db.session.delete(customer_purchase)
+        db.session.commit()
+
+        return jsonify({'message': 'Customer purchase deleted successfully', 'data': purchase_schema.dump(customer_purchase)}), 200
+    except:
+        return 'An error ocurred deleting the customer purchase', 500

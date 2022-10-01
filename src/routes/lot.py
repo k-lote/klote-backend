@@ -1,3 +1,4 @@
+from crypt import methods
 from flask import Blueprint, request, jsonify 
 from ..models.lot import Lot, lot_schema, lots_schema, LotHistory, lot_history_schema, lots_history_schema
 from ..models.allotment import Allotment
@@ -11,7 +12,7 @@ def register():
     allotment_id = request.json.get('allotment_id')
     block = request.json.get('block')
     value = request.json.get('value')
-    status = request.json.get('status') or 'available'
+    is_available = request.json.get('is_available') or True
 
     allotment = Allotment.query.filter_by(id=allotment_id).first()    
 
@@ -26,7 +27,7 @@ def register():
         last_number = last_number.number
         number = last_number + 1
     try:
-        new_lot = Lot(allotment_id, number, block, value, status)
+        new_lot = Lot(allotment_id, number, block, value, is_available)
         db.session.add(new_lot)
         db.session.commit()
 
@@ -51,6 +52,15 @@ def get_lot():
     for history in lot_history_dump:
         result['history'][history['id']] = history
     return jsonify({"data": result, "message": "Lot found"}), 200
+
+@lot.route('/get_lots', methods=['GET'])
+def get_all_lots():
+    lots = Lot.query.all()
+
+    if not lots:
+        return 'Lots not found', 400
+
+    return jsonify({'data': lots_schema.dump(lots)}), 200
 
 @lot.route('/get_lots/<int:allotment_id>', methods=['GET'])
 def get_lots(allotment_id):
