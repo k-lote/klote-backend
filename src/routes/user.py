@@ -295,7 +295,7 @@ def get_allotments_user(user_id):
             lots = Lot.query.filter_by(allotment_id=allotment['id']).all()
             lots_data = lots_schema.dump(lots)
             for lot in lots_data:
-                allotment['lots'][lot['number']] = lot['status']
+                allotment['lots'][lot['number']] = lot['is_available']
 
         return jsonify({"message": "Allotments found", "data": result}), 200
     except Exception as e:
