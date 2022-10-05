@@ -20,6 +20,7 @@ def register():
     corporate_name = request.json.get('corporate_name') or None
     admin_id = request.json.get('admin_id')
     email = request.json.get('email')
+    lots = request.json.get('lots') or []
 
     if not address or not phone1 or not name or not admin_id or not email:
         return jsonify({'msg': 'Missing arguments'}), 400
@@ -32,6 +33,17 @@ def register():
         if admin:
             db.session.add(new_customer)
             db.session.commit()
+
+        for lot in lots:
+            lot_disponibility = Lot.query.filter_by(allotment_id=lot['allotment_id'], number=lot['number']).first()
+            if lot_disponibility.is_available:
+                new_purchase = Purchase(lot['allotment_id'], lot['number'], new_customer.id)
+                db.session.add(new_purchase)
+                db.session.commit()
+                lot_disponibility.is_available = False
+                db.session.commit()
+            else:
+                return jsonify({'msg': 'Lot is not available'}), 400
 
         return jsonify({'message': 'Customer created successfully', 'data': customer_schema.dump(new_customer)}), 201
     except Exception as e:

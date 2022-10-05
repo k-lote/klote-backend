@@ -11,7 +11,8 @@ class Allotment(db.Model):
     name = db.Column(db.String(150), nullable=False)
     cep = db.Column(db.String(8), nullable=False)
     address = db.Column(db.String(150), nullable=False)
-    img_url = db.Column(db.String(150))
+    img_url = db.Column(db.String(255))
+    logo_url = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
