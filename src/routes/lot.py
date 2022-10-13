@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from ..models.lot import Lot, lot_schema, lots_schema, LotHistory, lot_history_schema, lots_history_schema
 from ..models.allotment import Allotment
 from ..models.customer import Purchase, Customer, customer_schema
+from ..models.finances import Installment, installment_schema, installments_schema
 from .. import db
 from .. import ma
 
@@ -58,6 +59,17 @@ def get_lot():
             customer_purchase = Purchase.query.filter_by(allotment_id=allotment_id, lot_number=number).first()
             customer = Customer.query.filter_by(id=customer_purchase.customer_id).first()
             result['customer'] = customer_schema.dump(customer)
+
+       
+            finances = Installment.query.filter_by(allotment_id=allotment_id, lot_number=number).all()
+            finances_dump = installments_schema.dump(finances)
+            result['installments'] = []
+            
+            for finance in finances_dump:
+                result['installments'].append(finance)
+                
+       
+        
 
         return jsonify({"data": result, "message": "Lot found"}), 200
     except Exception as e:

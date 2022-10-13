@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify 
-from ..models.finances import Installment, installment_schema, installments_schema, Purcharse, purcharse_schema, purcharse_schemas
+from ..models.finances import Installment, installment_schema, installments_schema
 from .. import db
 
 finances = Blueprint('finances', __name__)
@@ -7,24 +7,26 @@ finances = Blueprint('finances', __name__)
 # Installment
 @finances.route('/installment/register', methods=['POST'])
 def register_installment():
-    cod = request.json.get('cod')
     value = request.json.get('value')
-    status = request.json.get('status') or 'pending'
+    date = request.json.get('date')
+    is_paid = request.json.get('is_paid')
     installment_number = request.json.get('installment_number')
     allottment_id = request.json.get('allottment_id')
     number = request.json.get('number')
 
+
     try:
-        installment = Installment(cod, value, status, installment_number, allottment_id, number)
+        installment = Installment(value, date, installment_number, allottment_id, number, is_paid)
         db.session.add(installment)
         db.session.commit()
         return installment_schema.jsonify(installment), 200
-    except:
+    except Exception as e:
+        print(e)
         return jsonify({'message': 'An error occurred'}), 500
 
 @finances.route('/installment/get_installment/<int:id>', methods=['GET'])
 def get_installment(id):
-    installment = Installment.query.filter_by(id=id).first()
+    installment = Installment.query.filter_by(cod=id).first()
 
     if not installment:
         return jsonify({'message': 'Installment not found'}), 404
@@ -82,6 +84,7 @@ def delete_installment(id):
         return jsonify({'message': 'An error occurred'}), 500
 
 # Purcharse
+'''
 @finances.route('/purcharse/register', methods=['POST'])
 def register_purcharse():
     allotment_id = request.json.get('allotment_id')
@@ -151,3 +154,4 @@ def delete_purcharse(id):
         return jsonify({'message': 'Purcharse deleted successfully'}), 200
     except:
         return jsonify({'message': 'An error occurred'}), 500
+'''
