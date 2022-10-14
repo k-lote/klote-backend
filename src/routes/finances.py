@@ -42,6 +42,36 @@ def get_installments():
 
     return installments_schema.jsonify(installments), 200
 
+@finances.route('/installment/update/<int:id>', methods=['PUT'])
+def update_installment(id):
+    is_paid = request.json.get('is_paid')
+
+    installment = Installment.query.filter_by(cod=id).first()
+
+    if not installment:
+        return jsonify({'message': 'Installment not found'}), 404
+
+    try:
+        installment.is_paid = is_paid
+
+        db.session.commit()
+        return installment_schema.jsonify(installment), 200
+    except:
+        return jsonify({'message': 'An error occurred'}), 500
+
+@finances.route('/installment/delete/<int:id>', methods=['DELETE'])
+def delete_installment(id):
+    installment = Installment.query.filter_by(cod=id).first()
+
+    if not installment:
+        return jsonify({'message': 'Installment not found'}), 404
+
+    try:
+        db.session.delete(installment)
+        db.session.commit()
+        return jsonify({'message': 'Installment deleted successfully'}), 200
+    except:
+        return jsonify({'message': 'An error occurred'}), 500
 
 # Purcharse
 '''
