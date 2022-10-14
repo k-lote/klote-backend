@@ -1,7 +1,9 @@
+from turtle import title
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
+from flask_pydantic_spec import FlaskPydanticSpec
 import dotenv
 import os
 
@@ -12,6 +14,9 @@ ma = Marshmallow()
 
 app = Flask(__name__)
 app.config.from_object('config')
+
+spec = FlaskPydanticSpec('flask',title='Documentação API - Klote')
+spec.register(app)
 
 def create_app():
     from .routes.allotment import allotment
@@ -32,9 +37,13 @@ def create_app():
     app.register_blueprint(allotment, url_prefix="/allotment")
     app.register_blueprint(lot, url_prefix="/lot")
     app.register_blueprint(customer, url_prefix="/customer")
+
+    
    
     @app.route("/", methods=["GET"])
     def index():
         return "API is running", 200
+
+    
 
     return app
