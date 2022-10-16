@@ -12,6 +12,7 @@ def register():
     cep = request.json.get('cep')
     address = request.json.get('address')
     img_url = request.json.get('img_url') or None
+    logo_url = request.json.get('logo_url') or None
     users_access = request.json.get('users_access') or None
     
     try:

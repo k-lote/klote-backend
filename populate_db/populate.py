@@ -112,6 +112,20 @@ def populate_installments(qtd):
 
         requests.post(url + "/finances/installment/register", json=installment)
 
+def populate_historic(qtd):
+    get_lots()
+    get_customer_ids()
+    for i in range(qtd):
+        lot = random.choice(lots)
+        
+        historic = {
+            "allotment_id": lot[0],
+            "number": lot[1],
+            "description": "Descrição " + str(random.randint(0, 100))
+        }
+
+        requests.post(url + "/lot/history/register", json=historic)
+    
 if __name__ == "__main__":
     menu = """
     1 - Popular loteamentos
@@ -119,6 +133,7 @@ if __name__ == "__main__":
     3 - Popular clientes
     4 - Popular compras
     5 - Popular parcelas
+    6 - Popular Histórico
 
     0 - Sair
 
@@ -141,6 +156,9 @@ if __name__ == "__main__":
     elif option == 5:
         qtd = int(input("Digite a quantidade de parcelas: "))
         populate_installments(qtd)
+    elif option == 6:
+        qtd = int(input("Digite a quantidade de históricos: "))
+        populate_historic(qtd)
     elif option == 0:
         exit()
     else:
