@@ -16,7 +16,7 @@ def register():
     users_access = request.json.get('users_access') or None
     
     try:
-        new_allotment = Allotment(name, cep, address, img_url)
+        new_allotment = Allotment(name, cep, address, img_url, logo_url)
         db.session.add(new_allotment)
         db.session.commit()
         result = allotment_schema.dump(new_allotment)
