@@ -81,7 +81,7 @@ def get_customer(id):
         print(e)
         return 'An error ocurred getting the customer', 500
 
-    return jsonify({'customer': customer_schema.dump(customer)}), 200
+    return jsonify({'customer': customer}), 200
 
 @customer.route('/get_customers', methods=['GET'])
 def get_customers():
