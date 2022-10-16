@@ -152,12 +152,23 @@ def delete(id):
     if not customer:
         return jsonify({"message": "Customer not found", "data": {}}), 404
 
+
     try:
+        purchases = Purchase.query.filter_by(customer_id=id).all()
+        
+        if purchases:
+            for purchase in purchases:
+                lot = Lot.query.filter_by(allotment_id=purchase.allotment_id, number = purchase.lot_number).first()
+                lot.is_available = True
+
+                db.session.commit()
+
         db.session.delete(customer)
         db.session.commit()
 
         return jsonify({'message': 'Customer deleted successfully', 'data': customer_schema.dump(customer)}), 200
-    except:
+    except Exception as e:
+        print(e)
         return 'An error ocurred deleting the customer', 500
 
 # CUSTOMER HISTORY
