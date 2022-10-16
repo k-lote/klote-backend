@@ -237,7 +237,7 @@ def get_customers_purchases():
 
     return jsonify({'customers_purchases': purchase_schemas.dump(customers_purchases)}), 200
 
-@customer.route('/purchase/delete/<int:id>', methods=['DELETE'])
+@customer.route('/purchase/delete', methods=['DELETE'])
 def delete_purchase():
     allotment_id = request.json.get('allotment_id')
     lot_number = request.json.get('lot_number')
