@@ -65,8 +65,22 @@ def get_customers():
 
     if not customers:
         return 'Customers not found', 400
+    
+    response = customers_schema.dump(customers)
+    for customer in response:
+        customer["lots"] = []
+        purchases = Purchase.query.filter_by(customer_id=customer["id"]).all()
+        for purchase in purchases:
+            allotment = Allotment.query.filter_by(id=purchase.allotment_id).first()
+            lot = Lot.query.filter_by(allotment_id=purchase.allotment_id, number=purchase.lot_number).first()
+            customer["lots"].append({
+                "allotment_id": allotment.id,
+                "allotment_name": allotment.name,
+                "lot_number": lot.number,
+                "block": lot.block
+            })
 
-    return jsonify({'data': customers_schema.dump(customers)}), 200
+    return jsonify({'data': response}), 200
 
 @customer.route('/update/<int:id>', methods=['PUT'])
 def update(id):
