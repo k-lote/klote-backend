@@ -53,9 +53,33 @@ def register():
 @customer.route('/get_customer/<int:id>', methods=['GET'])
 def get_customer(id):
     customer = Customer.query.filter_by(id=id).first()
+    purchases_query = Purchase.query.all()
+    allotments_query = Allotment.query.all()
+    lots_query = Lot.query.all()
 
     if not customer:
         return 'Customer not found', 400
+
+    customer = customer_schema.dump(customer)
+    try:
+        customer["lots"] = []
+
+        purchases = [purchase for purchase in purchases_query if purchase.customer_id == customer["id"]]
+        #purchases = Purchase.query.filter_by(customer_id=customer["id"]).all()
+        for purchase in purchases:
+            allotment = [allotment for allotment in allotments_query if allotment.id == purchase.allotment_id][0]
+            #allotment = Allotment.query.filter_by(id=purchase.allotment_id).first()
+            lot = [lot for lot in lots_query if lot.allotment_id == allotment.id and lot.number == purchase.lot_number][0]
+            #lot = Lot.query.filter_by(allotment_id=purchase.allotment_id, number=purchase.lot_number).first()
+            customer["lots"].append({
+                "allotment_id": allotment.id,
+                "allotment_name": allotment.name,
+                "lot_number": lot.number,
+                "block": lot.block
+            })
+    except Exception as e:
+        print(e)
+        return 'An error ocurred getting the customer', 500
 
     return jsonify({'customer': customer_schema.dump(customer)}), 200
 

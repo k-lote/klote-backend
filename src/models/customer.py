@@ -32,7 +32,7 @@ class Customer(db.Model):
 
 class CustomerSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'address', 'status', 'phone1', 'phone2', 'cpf', 'name', 'cnpj', 'corporate_name')
+        fields = ('id', 'address', 'status', 'phone1', 'phone2', 'cpf', 'name', 'cnpj', 'corporate_name', 'email')
 
 class CustomerHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
