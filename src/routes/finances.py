@@ -1,5 +1,7 @@
+from curses import noraw
 from flask import Blueprint, request, jsonify 
 from ..models.finances import Installment, installment_schema, installments_schema
+from ..models.lot import Lot
 from .. import db
 
 finances = Blueprint('finances', __name__)
@@ -10,16 +12,32 @@ def register_installment():
     value = request.json.get('value')
     date = request.json.get('date')
     is_paid = request.json.get('is_paid')
-    installment_number = request.json.get('installment_number')
     allottment_id = request.json.get('allottment_id')
     number = request.json.get('number')
-
+    installment_qtd = request.json.get('installment_qtd')
 
     try:
-        installment = Installment(value, date, installment_number, allottment_id, number, is_paid)
-        db.session.add(installment)
+        lot = Lot.query.filter_by(allotment_id=allottment_id, number=number).first()
+        if not lot:
+            return 'Lot not found', 400
+        if lot.is_available:
+            return 'Lot not sold', 400
+        installment = Installment.query.filter_by(allotment_id=allottment_id, lot_number=number).first()
+        if installment:
+            return 'Installment already registered', 400
+
+        installments = []
+        for i in range(installment_qtd):
+            installment_number = number + i
+            new_installment = Installment(value, date, installment_number, allottment_id, number, is_paid)
+            
+            installments.append(new_installment)
+        
+        db.session.add_all(installments)
         db.session.commit()
-        return installment_schema.jsonify(installment), 200
+
+        
+        return installments_schema.jsonify(installments), 200
     except Exception as e:
         print(e)
         return jsonify({'message': 'An error occurred'}), 500

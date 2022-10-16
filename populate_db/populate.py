@@ -94,6 +94,23 @@ def populate_purcharse(qtd):
 
         requests.post(url + "/customer/purchase/register", json=purchase)
         
+def populate_installments(qtd):
+    get_lots()
+    get_customer_ids()
+    for i in range(qtd):
+        lot = random.choice(lots)
+        value = random.randint(1000, 10000)
+        installment_qtd = random.randint(1, 20)
+        
+        installment = {
+            "value": value,
+            "date": "2021-01-01",
+            "allottment_id": lot[0],
+            "number": lot[1],
+            "installment_qtd": installment_qtd,
+        }
+
+        requests.post(url + "/finances/installment/register", json=installment)
 
 if __name__ == "__main__":
     menu = """
@@ -101,6 +118,7 @@ if __name__ == "__main__":
     2 - Popular lotes
     3 - Popular clientes
     4 - Popular compras
+    5 - Popular parcelas
 
     0 - Sair
 
@@ -120,6 +138,9 @@ if __name__ == "__main__":
     elif option == 4:
         qtd = int(input("Digite a quantidade de compras: "))
         populate_purcharse(qtd)
+    elif option == 5:
+        qtd = int(input("Digite a quantidade de parcelas: "))
+        populate_installments(qtd)
     elif option == 0:
         exit()
     else:
