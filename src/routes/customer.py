@@ -61,15 +61,34 @@ def get_customer(id):
 
 @customer.route('/get_customers', methods=['GET'])
 def get_customers():
-    try:
+    customers = Customer.query.all()
+    purchases_query = Purchase.query.all()
+    allotments_query = Allotment.query.all()
+    lots_query = Lot.query.all()
 
-        query = """SELECT c.id AS customer_id, c.name AS customer_name, c.cpf, a.name AS allotment_name, a.id AS allotment_id, p.lot_number, l.block FROM customer c LEFT JOIN purchase p ON c.id = p.customer_id INNER JOIN lot l ON p.lot_number = l.number AND p.allotment_id = l.allotment_id INNER JOIN allotment a ON l.allotment_id = a.id"""
-        result = db.engine.execute(query)
+    if not customers:
+        return 'Customers not found', 400
+    
+    response = customers_schema.dump(customers)
 
-        return jsonify({'data': [dict(row) for row in result]}), 200
-    except Exception as e:
-        print(e)
-        return 'An error ocurred getting the customers', 500
+    for customer in response:
+        customer["lots"] = []
+
+        purchases = [purchase for purchase in purchases_query if purchase.customer_id == customer["id"]]
+        #purchases = Purchase.query.filter_by(customer_id=customer["id"]).all()
+        for purchase in purchases:
+            allotment = [allotment for allotment in allotments_query if allotment.id == purchase.allotment_id][0]
+            #allotment = Allotment.query.filter_by(id=purchase.allotment_id).first()
+            lot = [lot for lot in lots_query if lot.allotment_id == allotment.id and lot.number == purchase.lot_number][0]
+            #lot = Lot.query.filter_by(allotment_id=purchase.allotment_id, number=purchase.lot_number).first()
+            customer["lots"].append({
+                "allotment_id": allotment.id,
+                "allotment_name": allotment.name,
+                "lot_number": lot.number,
+                "block": lot.block
+            })
+
+    return jsonify({'data': response}), 200
 
 @customer.route('/update/<int:id>', methods=['PUT'])
 def update(id):
