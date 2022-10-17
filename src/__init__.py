@@ -6,8 +6,6 @@ from flask_cors import CORS
 import dotenv
 import os
 
-dotenv.load_dotenv(dotenv.find_dotenv())
-
 db = SQLAlchemy()
 ma = Marshmallow()
 
@@ -24,7 +22,6 @@ def create_app():
     from .routes.customer import customer
     from .routes.finances import finances
 
-    dotenv.load_dotenv(dotenv.find_dotenv())
     CORS(app, resources={r"/*": {"origins": "*"}})
     app.config.update(
         SQLALCHEMY_DATABASE_URI=os.getenv("DATABASE_URI"),
