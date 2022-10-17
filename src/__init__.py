@@ -1,7 +1,7 @@
 from flask import Flask, render_template, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-#from flask_pydantic_spec import FlaskPydanticSpec
+from flask_pydantic_spec import FlaskPydanticSpec
 from flask_cors import CORS
 import dotenv
 import os
@@ -15,8 +15,8 @@ ma = Marshmallow()
 app = Flask(__name__)
 app.config.from_object('config')
 
-#spec = FlaskPydanticSpec('flask',title='Documentação API - Klote')
-#spec.register(app)
+spec = FlaskPydanticSpec('flask',title='Documentação API - Klote')
+spec.register(app)
 
 def create_app():
     from .routes.allotment import allotment

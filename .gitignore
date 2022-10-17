@@ -8,6 +8,7 @@ __pycache__/
 
 Pipfile
 Pipfile.lock
+.env
 
 # Distribution / packaging
 .Python
