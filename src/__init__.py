@@ -6,6 +6,8 @@ from flask_cors import CORS
 import dotenv
 import os
 
+dotenv.load_dotenv(dotenv.find_dotenv())
+
 db = SQLAlchemy()
 ma = Marshmallow()
 
