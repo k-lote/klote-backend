@@ -1,10 +1,11 @@
-from flask import Flask, redirect
+from flask import Flask, render_template, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 #from flask_pydantic_spec import FlaskPydanticSpec
 from flask_cors import CORS
 import dotenv
 import os
+from .helpers.generateCarne import gerarPDF
 
 dotenv.load_dotenv(dotenv.find_dotenv())
 
@@ -42,5 +43,11 @@ def create_app():
     def index():
         #return redirect("/apidoc/swagger")
         return "API is running", 200
+
+    @app.route("/pdf/<name>")
+    def pdfCreate(name):
+        file = gerarPDF(name, 100)
+        #with open('arquivopdf.pdf', 'rb') as static_file:
+        return send_file(file, download_name=f"{name}.pdf", as_attachment=True)
 
     return app
