@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, send_file, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_pydantic_spec import FlaskPydanticSpec
@@ -41,13 +41,12 @@ def create_app():
    
     @app.route("/", methods=["GET"])
     def index():
-        #return redirect("/apidoc/swagger")
-        return "API is running", 200
+        return redirect("/apidoc/swagger")
+        #return "API is running", 200
 
     @app.route("/pdf/<name>")
     def pdfCreate(name):
         file = gerarPDF(name, 100)
-        #with open('arquivopdf.pdf', 'rb') as static_file:
         return send_file(file, download_name=f"{name}.pdf", as_attachment=True)
 
     return app
