@@ -1,4 +1,3 @@
-from turtle import delay
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 #A4 = (210*mm,297*mm)
@@ -7,7 +6,7 @@ def mm(mm):
     return mm/0.352777
 
 def gerarPDF(name, parcelas):
-    pdf = canvas.Canvas(name,pagesize=A4)
+    pdf = canvas.Canvas(f"static/{name}",pagesize=A4)
     eixo=mm(297)
 
     for parcela in range(1,parcelas+1):
@@ -16,8 +15,9 @@ def gerarPDF(name, parcelas):
         if parcela%4 == 0:
             pdf.showPage()
             eixo=mm(297)
-
     pdf.save()
+    file = open(f"static/{name}","rb")
+    return file
 
 def gerarparcela(pdf, cliente, eixo, parcela, parcelas):
     #pdf.drawImage("model.png",0,eixo,height=mm(74),width=mm(210))
