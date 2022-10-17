@@ -15,6 +15,7 @@ def register():
     block = request.json.get('block')
     value = request.json.get('value')
     is_available = request.json.get('is_available') or True
+    qtd = request.json.get('qtd') or 1
 
     allotment = Allotment.query.filter_by(id=allotment_id).first()    
 
@@ -29,14 +30,18 @@ def register():
         last_number = last_number.number
         number = last_number + 1
     try:
-        new_lot = Lot(allotment_id, number, block, value, is_available)
-        db.session.add(new_lot)
+        lots = []
+        for i in range(qtd):
+            new_lot = Lot(allotment_id, block, number, value, is_available)
+            lots.append(new_lot)
+            number += 1
+        db.session.add_all(lots)
         db.session.commit()
 
-        return jsonify({'message': 'Lot created successfully', 'data': lot_schema.dump(new_lot)}), 201
+        return jsonify({'message': 'Lot created successfully', 'data': lots_schema.dump(lots)}), 201
     except Exception as e:
         print(e)
-        return 'An error ocurred creating the lot', 500
+        return {'message': 'Error creating lot', 'error': str(e)}, 500
 
 @lot.route('/get_lot', methods=['POST'])
 def get_lot():
