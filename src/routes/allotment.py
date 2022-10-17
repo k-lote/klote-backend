@@ -38,7 +38,7 @@ def register():
         return jsonify({'message': 'Allotment created', 'data': result}), 201
     except Exception as e:
         print(e)
-        return jsonify({'message': 'Error creating allotment', 'data': {}}), 500
+        return jsonify({'message': 'Error creating allotment', 'error': e}), 500
 
 @allotment.route('/get_allotment/<int:allotment_id>', methods=['GET'])
 def get_allotment(allotment_id):
