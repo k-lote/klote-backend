@@ -45,8 +45,7 @@ def register():
 
         return jsonify({'message': 'Customer created successfully', 'data': customer_schema.dump(new_customer)}), 201
     except Exception as e:
-        print(e)
-        return 'An error ocurred creating the customer', 500
+        return jsonify({'msg': 'An error ocurred creating the customer', 'error': str(e)}), 500
 
 @customer.route('/get_customer/<int:id>', methods=['GET'])
 def get_customer(id):
