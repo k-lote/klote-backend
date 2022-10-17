@@ -17,8 +17,7 @@ def test_init_server(test_client):
 
     response=test_client.get("/")
      
-    assert response.get_data() == b'API is running'
-    assert response.status_code == 200
+    assert response.status_code == 302 #redirect
 
 def test_new_user():
     
@@ -28,3 +27,5 @@ def test_new_user():
     assert user.name == "Davi Novaes"
     assert user.cpf == "10029580404"
     assert user.phone == "81995167888"
+
+

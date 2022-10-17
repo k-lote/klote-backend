@@ -38,6 +38,7 @@ werkzeug = "==2.1.2"
 flask-restplus = "*"
 reportlab = "*"
 flask-pydantic-spec = "*"
+requests = "*"
 
 [dev-packages]
 
