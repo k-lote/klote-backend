@@ -13,7 +13,7 @@ def register():
     address = request.json.get('address')
     img_url = request.json.get('img_url') or None
     logo_url = request.json.get('logo_url') or None
-    users_access = request.json.get('users_access') or None
+    users_access = request.json.get('users_access') or []
     
     try:
         new_allotment = Allotment(name, cep, address, img_url, logo_url)
@@ -38,7 +38,7 @@ def register():
         return jsonify({'message': 'Allotment created', 'data': result}), 201
     except Exception as e:
         print(e)
-        return jsonify({'message': 'Error creating allotment', 'data': {}}), 500
+        return jsonify({'message': 'Error creating allotment', 'error': str(e)}), 500
 
 @allotment.route('/get_allotment/<int:allotment_id>', methods=['GET'])
 def get_allotment(allotment_id):
