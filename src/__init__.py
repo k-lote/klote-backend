@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
@@ -37,6 +37,7 @@ def create_app():
    
     @app.route("/", methods=["GET"])
     def index():
+        return render_template("index.html")
         return "API is running", 200
 
     return app
