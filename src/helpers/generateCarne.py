@@ -1,5 +1,6 @@
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+import os
 #A4 = (210*mm,297*mm)
 
 def mm(mm):
@@ -17,6 +18,8 @@ def gerarPDF(name, parcelas):
             eixo=mm(297)
     pdf.save()
     file = open(f"static/{name}.pdf","rb")
+    os.remove(f"static/{name}.pdf")
+
     return file
 
 def gerarparcela(pdf, cliente, eixo, parcela, parcelas):
