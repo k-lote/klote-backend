@@ -28,7 +28,10 @@ def register():
     try:
         new_customer = Customer(admin_id, address, phone1, phone2, cpf, name, cnpj, corporate_name, email)
         admin = User_klote.query.filter_by(user_id=admin_id).first()
-        
+        if admin:
+            db.session.add(new_customer)
+            db.session.commit()
+
         for lot in lots:
             lot_disponibility = Lot.query.filter_by(allotment_id=lot['allotment_id'], number=lot['number']).first()
             if lot_disponibility.is_available:
@@ -39,9 +42,6 @@ def register():
             else:
                 return jsonify({'msg': 'Lot is not available'}), 400
         
-        if admin:
-            db.session.add(new_customer)
-            db.session.commit()
 
         return jsonify({'message': 'Customer created successfully', 'data': customer_schema.dump(new_customer)}), 201
     except Exception as e:
