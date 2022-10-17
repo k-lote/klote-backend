@@ -19,6 +19,8 @@ Desenvolvimento de uma ferramenta que possibilite o gerenciamento dos lotes que 
 - [Insomnia](https://docs.insomnia.rest/insomnia/get-started) para testes manuais da API REST;
 - [Pytest](https://docs.pytest.org/en/7.1.x/) para testes automatizados das classes e funções;
 
+## ▶️ Vídeo demonstração
+https://youtu.be/76P9Llz_hCk
 
 ## 👨‍🏫 Professor responsável
 
