@@ -27,13 +27,8 @@ def register():
 
     try:
         new_customer = Customer(admin_id, address, phone1, phone2, cpf, name, cnpj, corporate_name, email)
-
         admin = User_klote.query.filter_by(user_id=admin_id).first()
         
-        if admin:
-            db.session.add(new_customer)
-            db.session.commit()
-
         for lot in lots:
             lot_disponibility = Lot.query.filter_by(allotment_id=lot['allotment_id'], number=lot['number']).first()
             if lot_disponibility.is_available:
@@ -44,6 +39,10 @@ def register():
                 db.session.commit()
             else:
                 return jsonify({'msg': 'Lot is not available'}), 400
+        
+        if admin:
+            db.session.add(new_customer)
+            db.session.commit()
 
         return jsonify({'message': 'Customer created successfully', 'data': customer_schema.dump(new_customer)}), 201
     except Exception as e:
@@ -82,6 +81,37 @@ def get_customer(id):
         return 'An error ocurred getting the customer', 500
 
     return jsonify({'customer': customer}), 200
+
+@customer.route('/get_customers/<int:admin_id>', methods=['GET'])
+def get_customers_by_admin(admin_id):
+    customers = Customer.query.filter_by(admin_id=admin_id).all()
+    purchases_query = Purchase.query.all()
+    allotments_query = Allotment.query.all()
+    lots_query = Lot.query.all()
+
+    if not customers:
+        return 'Customers not found', 400
+    
+    response = customers_schema.dump(customers)
+
+    for customer in response:
+        customer["lots"] = []
+
+        purchases = [purchase for purchase in purchases_query if purchase.customer_id == customer["id"]]
+        #purchases = Purchase.query.filter_by(customer_id=customer["id"]).all()
+        for purchase in purchases:
+            allotment = [allotment for allotment in allotments_query if allotment.id == purchase.allotment_id][0]
+            #allotment = Allotment.query.filter_by(id=purchase.allotment_id).first()
+            lot = [lot for lot in lots_query if lot.allotment_id == allotment.id and lot.number == purchase.lot_number][0]
+            #lot = Lot.query.filter_by(allotment_id=purchase.allotment_id, number=purchase.lot_number).first()
+            customer["lots"].append({
+                "allotment_id": allotment.id,
+                "allotment_name": allotment.name,
+                "lot_number": lot.number,
+                "block": lot.block
+            })
+
+    return jsonify({'data': response}), 200
 
 @customer.route('/get_customers', methods=['GET'])
 def get_customers():
