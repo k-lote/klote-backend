@@ -13,7 +13,7 @@ def register():
     address = request.json.get('address')
     img_url = request.json.get('img_url') or None
     logo_url = request.json.get('logo_url') or None
-    users_access = request.json.get('users_access') or None
+    users_access = request.json.get('users_access') or []
     
     try:
         new_allotment = Allotment(name, cep, address, img_url, logo_url)
