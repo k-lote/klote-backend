@@ -16,11 +16,12 @@ class Allotment(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, name, cep, address, img_url):
+    def __init__(self, name, cep, address, img_url, logo_url):
         self.name = name
         self.cep = cep
         self.address = address
         self.img_url = img_url
+        self.logo_url = logo_url
 
 class AllotmentSchema(ma.Schema):
     class Meta:
