@@ -6,17 +6,17 @@ def mm(mm):
     return mm/0.352777
 
 def gerarPDF(name, parcelas):
-    pdf = canvas.Canvas(f"static/{name}",pagesize=A4)
+    pdf = canvas.Canvas(f"static/{name}.pdf",pagesize=A4)
     eixo=mm(297)
 
     for parcela in range(1,parcelas+1):
-        gerarparcela(pdf,"Davi", eixo, parcela, parcelas)
+        gerarparcela(pdf,name, eixo, parcela, parcelas)
         eixo-=mm(74)
         if parcela%4 == 0:
             pdf.showPage()
             eixo=mm(297)
     pdf.save()
-    file = open(f"static/{name}","rb")
+    file = open(f"static/{name}.pdf","rb")
     return file
 
 def gerarparcela(pdf, cliente, eixo, parcela, parcelas):

@@ -41,11 +41,10 @@ def create_app():
         return render_template("index.html")
         return "API is running", 200
 
-    @app.route("/pdf")
-    def pdfCreate():
-        name="teste1.pdf"
+    @app.route("/pdf/<name>")
+    def pdfCreate(name):
         file = gerarPDF(name, 100)
         #with open('arquivopdf.pdf', 'rb') as static_file:
-        return send_file(file, download_name=name, as_attachment=True)
+        return send_file(file, download_name=f"{name}.pdf", as_attachment=True)
 
     return app
