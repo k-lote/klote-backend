@@ -33,9 +33,8 @@ def register():
             lot_disponibility = Lot.query.filter_by(allotment_id=lot['allotment_id'], number=lot['number']).first()
             if lot_disponibility.is_available:
                 new_purchase = Purchase(lot['allotment_id'], lot['number'], new_customer.id)
-                db.session.add(new_purchase)
-                db.session.commit()
                 lot_disponibility.is_available = False
+                db.session.add(new_purchase)
                 db.session.commit()
             else:
                 return jsonify({'msg': 'Lot is not available'}), 400
@@ -191,6 +190,7 @@ def delete(id):
                 lot = Lot.query.filter_by(allotment_id=purchase.allotment_id, number = purchase.lot_number).first()
                 lot.is_available = True
 
+                db.session.delete(purchase)
                 db.session.commit()
 
         db.session.delete(customer)
