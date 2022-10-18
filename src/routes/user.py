@@ -226,10 +226,17 @@ def send_email():
 
     if not user:
         return "User not found", 404
+    password = random_password()
+    try:
+        user.password = generate_password_hash(password, method='sha256')
+        db.session.commit()
+        send_email_reset_password(user.email, user.name, password)
+        return "Email sent", 200
+    except:
+        return jsonify({"message": "Error getting users", "data": {}}), 500
+    
 
-    send_email_reset_password(user.email, user.name)
-
-    return "Email sent", 200
+    
 
 @auth.route("/add_allotment_access", methods=["POST"])
 def add_access():

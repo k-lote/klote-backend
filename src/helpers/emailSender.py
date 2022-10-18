@@ -2,12 +2,12 @@ import smtplib
 import email.message
 import os
 
-def send_email_reset_password(emailClient, name):
+def send_email_reset_password(emailClient, name, password):
     body = f"""
     <h1>Olá, {name}</h1>
     <p>Seu pedido de redefinição de senha foi realizado com sucesso.</p>
-    <p>Para redefinir sua senha, clique no link abaixo:</p>
-    <a href="http://klote.netlify.app">Redefinir senha</a>
+    <p>Sua senha temporária é: {password}, clique no link abaixon:</p>
+    <a href="http://klote.netlify.app">Fazer login</a>
     """.encode('utf-8')
     msg = email.message.EmailMessage()
     msg['Subject'] = 'KLOTE: Redefinição de senha'

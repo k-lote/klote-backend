@@ -13,6 +13,9 @@ O projeto foi dividido em 3 repositórios, sendo eles:
 ## 📑 Sobre
 Desenvolvimento de uma ferramenta que possibilite o gerenciamento dos lotes que foram vendidos, que estão disponíveis, além de permitir o acompanhamento do pagamento das parcelas. O sistema permitirá que seja gerado carnês de pagamento para cada lote comprado, já que o nosso público alvo são pessoas que possuem lotes de terra no interior de Pernambuco e que desejam ter maior controle sobre o que está sendo vendido. Tudo isso sendo desenvolvido dentro das regras de negócio estabelecidas pelo cliente.
 
+## ▶️ Vídeo demonstração
+https://youtu.be/76P9Llz_hCk
+
 ## 👩🏽‍💻 Tecnologias
 - [Flask](https://flask.palletsprojects.com/en/2.2.x/) como (micro)framework web [Python](https://docs.python.org/3/);
 - [ElephantSQL](https://www.elephantsql.com/docs/index.html) para o uso do SGBD [PostgreSQL](https://www.postgresql.org/docs/) como um banco de dados temporário para testes;
