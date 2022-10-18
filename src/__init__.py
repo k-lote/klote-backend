@@ -5,7 +5,7 @@ from flask_pydantic_spec import FlaskPydanticSpec
 from flask_cors import CORS
 import dotenv
 import os
-from .helpers.generateCarne import gerarPDF
+
 
 dotenv.load_dotenv(dotenv.find_dotenv())
 
@@ -46,7 +46,8 @@ def create_app():
 
     @app.route("/pdf/<name>")
     def pdfCreate(name):
-        file = gerarPDF(name, 100)
+        from .helpers.generateCarne import gerarPDF
+        file = gerarPDF(name, 50)
         return send_file(file, download_name=f"{name}.pdf", as_attachment=True)
 
     return app
