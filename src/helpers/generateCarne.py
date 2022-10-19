@@ -34,7 +34,7 @@ def gerarPDF(name, parcelas):
         eixo-=mm(72)
         if parcela.installment_number%4 == 0:
             pdf.showPage()
-            eixo=mm(297)
+            eixo=mm(295)
     pdf.save()
     file = open(f"static/{name}.pdf","rb")
     os.remove(f"static/{name}.pdf")
@@ -42,8 +42,12 @@ def gerarPDF(name, parcelas):
     return file
 
 def gerarparcela(pdf,customer,loteamento,lote, eixo, parcela,parcelas):
-    #pdf.drawImage("model.png",0,eixo,height=mm(74),width=mm(210))
-    margem=mm(2)
+
+    """
+    Primeira parte da parcela
+    """
+    
+    margem=mm(3)
     pdf.line(margem,eixo,mm(210)-margem,eixo)
     pdf.line(margem,eixo-mm(70),mm(210)-margem,eixo-mm(70))
     pdf.line(margem,eixo,margem,eixo-mm(70)) #vertical inicio
@@ -66,11 +70,44 @@ def gerarparcela(pdf,customer,loteamento,lote, eixo, parcela,parcelas):
         pdf.drawString(margem+mm(1),eixo-mm(33-12*i),str(inforEsq[i]))
         pdf.drawString(margem+mm(20),eixo-mm(33-12*i),str(inforDir[i]))
         pdf.setFont("Helvetica", 9)
-        
+    
+    """
+    Segunda parte da parcela
+    """
+
+
 
     pdf.setFont("Helvetica", 12)
     pdf.drawString(margem+mm(45),eixo-mm(8),customer.name)
     #pdf.drawString(margem+mm(45),eixo-mm(70),f"{parcela}/{parcelas}")
+
+
+
+    """
+    Terceira parte da parcela
+    """
+
+    pdf.line(mm(210-44.7),eixo,mm(210-44.7),eixo-mm(56)) #vertical terceira parte
+    titulos = ["( = ) Total Cobrado","( + ) Outros Acrécimos", "( + ) Multa / Mora", "( - ) Outros descontos", "( - ) Desconto"]
+    pdf.setFont("Helvetica", 9)
+    for i in range(5): #linha horizontais
+        pdf.line(mm(210-44.7),eixo-mm(56-7*i),mm(210)-margem,eixo-mm(56-7*i)) 
+        pdf.drawString(mm(210-44.7)+mm(1),eixo-mm(55-7*i),titulos[i])
+
+    titulosEsq= ["( = ) Valor do Documento",  "Parcela"]
+    titulosDir=["", "Vencimento"]
+    inforDir=[f"R$ {parcela.value}", str(parcela.date).split()[0]]
+    inforEsq=["", f"{parcela.installment_number}/{parcelas}"]
+    deltaY=-mm(12)
+    deltaX=mm(210-44.7)-margem
+    for i in range(2):
+        pdf.line(margem+deltaX,eixo-mm(35-12*i)-deltaY,mm(210)-margem,eixo-mm(35-12*i)-deltaY) 
+        pdf.drawString(margem+mm(1)+deltaX,eixo-mm(27-12*i)-deltaY,titulosEsq[i])
+        pdf.drawString(margem+mm(20)+deltaX,eixo-mm(27-12*i)-deltaY,titulosDir[i])
+        pdf.setFont("Helvetica", 11)
+        pdf.drawString(margem+mm(1)+deltaX,eixo-mm(33-12*i)-deltaY,str(inforEsq[i]))
+        pdf.drawString(margem+mm(20)+deltaX,eixo-mm(33-12*i)-deltaY,str(inforDir[i]))
+        pdf.setFont("Helvetica", 9)
     
     return pdf
 
