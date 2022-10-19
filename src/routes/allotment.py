@@ -14,6 +14,10 @@ def register():
     img_url = request.json.get('img_url') or None
     logo_url = request.json.get('logo_url') or None
     users_access = request.json.get('users_access') or []
+
+    if not name: return 'Name is required', 400
+    if not cep: return 'CEP is required', 400
+    if not address: return 'Address is required', 400
     
     try:
         new_allotment = Allotment(name, cep, address, img_url, logo_url)
