@@ -32,7 +32,7 @@ def register():
     try:
         lots = []
         for i in range(qtd):
-            new_lot = Lot(allotment_id, block, number, value, is_available)
+            new_lot = Lot(allotment_id, number,block, value, is_available)
             lots.append(new_lot)
             number += 1
         db.session.add_all(lots)
