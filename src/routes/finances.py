@@ -3,6 +3,8 @@ from flask import Blueprint, request, jsonify
 from ..models.finances import Installment, installment_schema, installments_schema
 from ..models.lot import Lot
 from .. import db
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 finances = Blueprint('finances', __name__)
 
@@ -11,11 +13,12 @@ finances = Blueprint('finances', __name__)
 def register_installment():
     value = request.json.get('value')
     date = request.json.get('date')
-    is_paid = request.json.get('is_paid')
+    is_paid = request.json.get('is_paid') or False
     allottment_id = request.json.get('allottment_id')
-    number = request.json.get('number')
+    number = request.json.get('lot_number')
     installment_qtd = request.json.get('installment_qtd')
 
+    print(value, date,is_paid,allottment_id,number,installment_qtd)
     try:
         lot = Lot.query.filter_by(allotment_id=allottment_id, number=number).first()
         if not lot:
@@ -25,13 +28,20 @@ def register_installment():
         installment = Installment.query.filter_by(allotment_id=allottment_id, lot_number=number).first()
         if installment:
             return 'Installment already registered', 400
+        
 
+        value = lot.value/int(installment_qtd)
         installments = []
-        for i in range(installment_qtd):
-            installment_number = number + i
-            new_installment = Installment(value, date, installment_number, allottment_id, number, is_paid)
+        installment_number = 1
+        date=datetime.strptime(date, "%d/%m/%Y") #Precisa verificar o padrão de data do Frontend.
+
+        for i in range(int(installment_qtd)):
             
+            print(installment_number)
+            new_installment = Installment(value, date, int(installment_number), int(allottment_id), int(number), is_paid)
             installments.append(new_installment)
+            date = date + relativedelta(months=1)
+            installment_number += 1
         
         db.session.add_all(installments)
         db.session.commit()
