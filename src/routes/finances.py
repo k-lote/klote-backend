@@ -1,24 +1,23 @@
 from curses import noraw
-from flask import Blueprint, request, jsonify 
+from flask import Blueprint, request, jsonify, send_file
 from ..models.finances import Installment, installment_schema, installments_schema
 from ..models.lot import Lot
 from .. import db
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
+
 finances = Blueprint('finances', __name__)
 
 # Installment
 @finances.route('/installment/register', methods=['POST'])
 def register_installment():
-    value = request.json.get('value')
     date = request.json.get('date')
     is_paid = request.json.get('is_paid') or False
     allottment_id = request.json.get('allottment_id')
     number = request.json.get('lot_number')
     installment_qtd = request.json.get('installment_qtd')
 
-    print(value, date,is_paid,allottment_id,number,installment_qtd)
     try:
         lot = Lot.query.filter_by(allotment_id=allottment_id, number=number).first()
         if not lot:
@@ -51,6 +50,40 @@ def register_installment():
     except Exception as e:
         print(e)
         return jsonify({'message': 'An error occurred'}), 500
+
+
+@finances.route('/installment/get_pdf', methods=['GET'])
+def pdfCreate():
+    from ..helpers.generateCarne import gerarPDF
+    from ..models.allotment import Allotment, AllotmentSchema
+    from ..models.customer import Customer, CustomerSchema
+
+    allotment_id = request.json.get('allotment_id')
+    lot_number = request.json.get('lot_number')
+    customer_id = request.json.get('customer_id')
+
+    try:
+        allotment = Allotment.query.filter_by(id=allotment_id).first()
+        if not allotment:
+            return 'Allotment not found', 400
+        lot = Lot.query.filter_by(allotment_id=allotment_id, number=lot_number).first()
+        if not lot:
+            return 'Lot not found', 400
+        customer = Customer.query.filter_by(id=customer_id).first()
+        if not customer:
+            return 'Customer not found', 400
+        installment = Installment.query.filter_by(allotment_id=allotment_id, lot_number=lot_number).all()
+        if not installment:
+                return 'Installments not found', 400
+
+        file = gerarPDF(customer, allotment, lot, installment)
+        return send_file(file, download_name=f"{customer.name}.pdf", as_attachment=True)
+
+    except Exception as e:
+        print(e)
+        return jsonify({'message': 'An error occurred'}), 500
+
+
 
 @finances.route('/installment/get_installment/<int:id>', methods=['GET'])
 def get_installment(id):
