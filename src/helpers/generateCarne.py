@@ -14,21 +14,28 @@ from ..models.finances import Installment, installment_schema, installments_sche
 def mm(mm):
     return mm/0.352777
 
-def gerarPDF(name, parcelas):
+def gerarPDF(customer, loteamento, lote, listParcelas):
     #given
+    """
     customer = Customer(admin_id=1, address="Rua teste", phone1=81995167888, cpf=10029580404, name=name, email="teste@gmail.com", is_active=True, phone2=81995167888,cnpj="", corporate_name="")
     customer.id = 1
     loteamento = Allotment(name=name, cep=51160035, address="Rua do teste", img_url="", logo_url="")
     lote = Lot(allotment_id=loteamento.id, number=2, block="A", value=10000, is_available=False)
     valorParcela= lote.value/parcelas
     listParcelas = []
+    
     for i in range(1,parcelas):
         listParcelas.append(Installment(value=valorParcela,date=datetime.now() ,installment_number=i, allotment_id=loteamento.id, lot_number=lote.number, is_paid = False))
         listParcelas[i-1].cod=i+313
-    #then
-    pdf = canvas.Canvas(f"static/{name}.pdf",pagesize=A4)
-    eixo=mm(295)
 
+    """
+
+    #then
+    pdf = canvas.Canvas(f"static/{customer.name}.pdf",pagesize=A4)
+    eixo=mm(295)
+    parcelas = len(listParcelas) # MUDAR
+    print("chegou")
+    print(len(listParcelas))
     for parcela in listParcelas:
         gerarparcela(pdf,customer,loteamento,lote, eixo, parcela, parcelas)
         eixo-=mm(72)
@@ -36,8 +43,8 @@ def gerarPDF(name, parcelas):
             pdf.showPage()
             eixo=mm(295)
     pdf.save()
-    file = open(f"static/{name}.pdf","rb")
-    os.remove(f"static/{name}.pdf")
+    file = open(f"static/{customer.name}.pdf","rb")
+    os.remove(f"static/{customer.name}.pdf")
 
     return file
 

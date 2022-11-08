@@ -39,6 +39,7 @@ flask-restplus = "*"
 reportlab = "*"
 flask-pydantic-spec = "*"
 requests = "*"
+python-dateutil = "*"
 
 [dev-packages]
 
