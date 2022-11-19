@@ -1,4 +1,3 @@
-from curses import noraw
 from flask import Blueprint, request, jsonify, send_file
 from ..models.finances import Installment, installment_schema, installments_schema
 from ..models.lot import Lot
