@@ -34,7 +34,7 @@ def authenticate():
     if check_password_hash(user.password, auth.password):
         user_data = user_schema.dump(user)
         token = jwt.encode({"user_data": user_schema.dump(user), 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)}, app.config['SECRET_KEY'])
-        response = jsonify({'message': 'Login successful', 'token': token, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)})
+        response = jsonify({'message': 'Login successful', "user_data": user_schema.dump(user),'token': token, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)})
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.status_code = 200
         return response
