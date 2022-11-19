@@ -23,7 +23,6 @@ marshmallow = "==3.17.0"
 marshmallow-sqlalchemy = "==0.28.1"
 packaging = "==21.3"
 pluggy = "==1.0.0"
-psycopg2 = "==2.9.3"
 py = "==1.11.0"
 pycparser = "==2.21"
 pyjwt = "==2.4.0"
@@ -40,6 +39,7 @@ reportlab = "*"
 flask-pydantic-spec = "*"
 requests = "*"
 python-dateutil = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
